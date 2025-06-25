@@ -5,12 +5,12 @@
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "40dcdc14-b01b-4e74-be44-464efe69c990",
+      "id": "2b5d80a4-7d2b-4bb5-a773-5ffaca2190bc",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
-        200,
-        580
+        -360,
+        520
       ],
       "typeVersion": 1
     },
@@ -28,12 +28,12 @@
         },
         "options": {}
       },
-      "id": "eeac3626-b0e3-4ac0-8c26-f267ff610359",
+      "id": "66da0210-6066-457f-bcc3-1af98e9859ca",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
-        360,
-        120
+        -360,
+        160
       ],
       "typeVersion": 3.4,
       "onError": "continueRegularOutput"
@@ -42,12 +42,12 @@
       "parameters": {
         "options": {}
       },
-      "id": "8cd0b38a-637e-4972-81f8-9e3dadd4c03d",
+      "id": "f3ad0404-4b14-4398-a1cb-2aa272573c06",
       "name": "Filter: Only 1 item",
       "type": "n8n-nodes-base.splitInBatches",
       "position": [
-        540,
-        160
+        -180,
+        200
       ],
       "typeVersion": 3
     },
@@ -58,18 +58,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "84898f5d-0b46-485d-a8ca-3e023404c0fc",
+      "id": "39f1feab-12f2-47ab-96a6-4bb56ebc6417",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        720,
-        -40
+        0,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "6oDYSqSiiTqyALK2",
-          "name": "Zoom account"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -78,12 +78,12 @@
         "operation": "text",
         "options": {}
       },
-      "id": "c0af2771-24fe-4cf8-b867-64becffa242e",
+      "id": "593331c7-f4a4-4900-9ab1-4ce4f2d5e3ab",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        900,
-        120
+        180,
+        160
       ],
       "typeVersion": 1
     },
@@ -101,12 +101,12 @@
         },
         "options": {}
       },
-      "id": "46f29dec-62d6-4309-80ff-57008a879962",
+      "id": "8b0bccb8-cb57-43ab-87dd-4a5d5ca9f2bc",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
-        1080,
-        120
+        360,
+        160
       ],
       "typeVersion": 3.4
     },
@@ -117,18 +117,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "688516ad-e026-4a6f-bb6a-c82079ef8129",
+      "id": "6086aff8-ebaf-4ea9-a5eb-b66d3ec46b72",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        1280,
-        120
+        560,
+        160
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "6oDYSqSiiTqyALK2",
-          "name": "Zoom account"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -158,25 +158,25 @@
         },
         "options": {}
       },
-      "id": "e0e7362c-6462-4c3d-9390-78ef7b79b813",
+      "id": "e6e4da6f-587c-4b61-a109-045f43fcc0a5",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        1720,
-        120
+        1000,
+        160
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const getSection = (title) => {\n    const regex = new RegExp(`\\\\*\\\\*${title}:\\\\*\\\\*[\\\\s\\\\S]*?(?=\\\\*\\\\*|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[0].replace(new RegExp(`\\\\*\\\\*${title}:\\\\*\\\\*`, 'i'), '').trim() : '';\n  };\n\n  const title = body.match(/\\*\\*Meeting on (.*?)\\*\\*/)?.[1] || 'Meeting';\n  const participants = getSection('Participants');\n  const summary = getSection('Summary of the Meeting');\n\n  const html = `<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px;\">\n<h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Meeting Minutes: ${title}</h1>\n\n${participants ? `\n<h2 style=\"color: #2c3e50; margin-top: 20px;\">Participants:</h2>\n<ul style=\"list-style-type: none; padding-left: 20px;\">\n${participants.split('\\n').map(p => `<li>${p.replace('- ', '')}</li>`).join('\\n')}\n</ul>` : ''}\n\n${summary ? `\n<h2 style=\"color: #2c3e50; margin-top: 20px;\">Meeting Summary:</h2>\n<p style=\"margin-left: 20px;\">${summary}</p>` : ''}\n\n</body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    }\n  });\n}\n\nreturn items;"
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const getSection = (title) => {\n    const regex = new RegExp(\n      `\\\\*\\\\*${title}:\\\\*\\\\*[\\\\s\\\\S]*?(?=\\\\*\\\\*|$)`,\n      \"i\",\n    );\n    const match = body.match(regex);\n    return match\n      ? match[0].replace(new RegExp(`\\\\*\\\\*${title}:\\\\*\\\\*`, \"i\"), \"\").trim()\n      : \"\";\n  };\n\n  const titleMatch = body.match(/\\*\\*Fecha:\\*\\*\\s*(.*?)\\n/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const participantes = getSection(\"Participantes\");\n  const resumen = getSection(\"Resumen general de la reunión\");\n  const citas = getSection(\"Intervenciones destacadas o citas relevantes\");\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${\n      participantes\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Participantes:</h2>\n    <ul style=\"list-style-type: none; padding-left: 20px;\">\n    ${participantes\n      .split(\"\\n\")\n      .map((p) => `<li>${p.replace(\"- \", \"\")}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n    ${\n      resumen\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la reunión:</h2>\n    <p style=\"margin-left: 20px;\">${resumen}</p>`\n        : \"\"\n    }\n\n    ${\n      citas\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n    <ul style=\"margin-left: 20px;\">\n    ${citas\n      .split(\"\\n\")\n      .map((p) => `<li>${p.trim()}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
       },
-      "id": "68cdb518-26a9-40a4-99f6-1042a03811d8",
+      "id": "14b62c6d-0746-4f54-90e2-65f6444c9d9b",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        1880,
-        120
+        1160,
+        160
       ],
       "typeVersion": 2
     },
@@ -188,19 +188,19 @@
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "a936363c-3c7e-4d75-83c0-2b55e7ef84d9",
+      "id": "77f2954d-93db-4b2b-ac5d-d99f26b82fc1",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        2040,
-        120
+        1320,
+        160
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "I5rrg8d03BADbJd9",
-          "name": "SMTP account"
+          "id": "0Wmnl8T7UfTjqSNn",
+          "name": "SMTP dante.luque.edu.pe"
         }
       }
     },
@@ -212,17 +212,17 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "eb6511f6-5a59-4091-ba79-bed85362ff7f",
+      "id": "d082df5f-2e27-4c56-a5fb-b7fb2e547808",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -80,
-        460
+        -620,
+        380
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "6oDYSqSiiTqyALK2",
+          "id": "GvkMMGjMdcsNDBlN",
           "name": "zoom-bot-UAI"
         }
       },
@@ -231,34 +231,35 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Create a formal meeting minutes document from the following transcript and meeting details.\n\nMeeting Date: {{ $('Zoom: Get data by meetingId').item.json.start_time }} \nParticipants: {{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\nTranscript:\n{{ $('Format transcript text').item.json.transcript }}\n\nPlease create the minutes in the following format:\n\nMeeting on [Date]\n\nParticipants:\n[List of participants with email addresses]\n\nSummary of the Meeting:\n[Brief and concise summary of the topics discussed]\n",
+        "text": "=Redacta un acta formal de reunión en español utilizando los siguientes datos del transcript y los detalles de la reunión.\n\nFecha de la reunión: {{ $('Zoom: Get data by meetingId').item.json.start_time }}\n\nParticipantes:\n{{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\nTranscript de la reunión:\n{{ $('Format transcript text').item.json.transcript }}\n\nPor favor, estructura el acta con los siguientes apartados:\n\n---\n\n**Acta de Reunión**\n\n**Fecha:** [Fecha en formato DD/MM/AAAA]  \n**Hora de inicio y fin (si está disponible):**  \n**Participantes:** [Nombres con sus respectivos correos]  \n**Resumen general de la reunión:**  \n[Redactar en un párrafo claro y profesional los temas tratados, decisiones tomadas, acuerdos importantes y cualquier punto pendiente.]  \n**Intervenciones destacadas o citas relevantes:**  \n[Listar frases o puntos clave mencionados por los participantes, si aplica.]  \n\n---\n\nEl estilo debe ser formal, claro y redactado en **español neutro profesional**. No inventes información si no está presente en el transcript.\n",
         "options": {}
       },
-      "id": "8582b448-cded-4e76-bc4e-6e2ee637b022",
+      "id": "b305c0a3-5acd-4756-a2ac-af9ea6aea6e8",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
-        1400,
-        300
+        680,
+        340
       ],
       "typeVersion": 1.9
     },
     {
       "parameters": {
+        "model": "qwen/qwq-32b:free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        1320,
-        560
+        600,
+        600
       ],
-      "id": "5d88f22b-50b9-43d1-8798-bec9c1c509d8",
+      "id": "112b6ac7-d715-41d5-bfd3-ee1d8c115254",
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "g4S1njoK6pyWCNHg",
-          "name": "OpenRouter account"
+          "id": "E6M0X8KXICCAroWG",
+          "name": "OpenRouter apikey"
         }
       }
     },
@@ -271,10 +272,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -900,
-        640
+        -1300,
+        580
       ],
-      "id": "199f8209-0ac8-4cb6-9ba4-fb96b3e9ab0e",
+      "id": "e1bbb747-6f74-4538-a229-9b62ae9589b2",
       "name": "recording-completed",
       "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
     },
@@ -285,12 +286,12 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "14cda515-9d4b-4abd-a0e8-073a6089b47f",
+      "id": "a6ac3b3b-ef1b-41ec-98e9-761081171e04",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -320,
-        600
+        -880,
+        500
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -298,7 +299,7 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "6oDYSqSiiTqyALK2",
+          "id": "GvkMMGjMdcsNDBlN",
           "name": "Zoom account"
         }
       }
@@ -311,10 +312,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -620,
-        760
+        -1060,
+        640
       ],
-      "id": "b95dd658-489f-44db-a64b-5490e13a7621",
+      "id": "0e251cf7-bea1-4716-b1ac-f6e1e55e7b63",
       "name": "basic-info"
     }
   ],
@@ -493,11 +494,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "3b38f485-6520-4904-84e8-baf64fecc586",
+  "versionId": "d3bf9d96-a286-4a2f-824e-05a43c3215c1",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "e47916f16020ed4918dad89a6a8c70a52a5c0e995bce6bf690870884842c9bc6"
+    "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
   },
-  "id": "kokXj43s97Rp3tBr",
+  "id": "67mwO3ZHVWS2KiSs",
   "tags": []
 }
