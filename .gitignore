@@ -1,0 +1,5 @@
+# n8n persistence
+n8n_data/
+
+# enviroments
+.env
