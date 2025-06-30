@@ -5,12 +5,12 @@
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "6d6ea376-2d55-448b-ba2c-e1e8f6525a55",
+      "id": "3d0bfdf6-8918-419d-ace7-7659cbcdd0b7",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
-        -380,
-        320
+        0,
+        180
       ],
       "typeVersion": 1
     },
@@ -22,18 +22,18 @@
               "id": "ef149af8-7f9d-4e5a-8ccf-4a5f1e09eecc",
               "name": "transcript_file",
               "type": "string",
-              "value": "={{ $json.recording_files.find(f => f.file_type === 'TRANSCRIPT').download_url }}"
+              "value": "={{ $json.recording_files.find(f => f.file_type === 'CC' && f.file_extension === 'VTT')?.download_url }}"
             }
           ]
         },
         "options": {}
       },
-      "id": "bd37955d-1df6-4811-855b-8e73ae92851b",
+      "id": "82c41eb9-797f-4e6b-b305-743cdf08148f",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
-        -380,
-        140
+        0,
+        0
       ],
       "typeVersion": 3.4,
       "onError": "continueRegularOutput"
@@ -45,18 +45,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "e0f9df44-1f63-48d0-ac56-a9e9a16d4caa",
+      "id": "15e2134c-5ec6-4562-8d43-6f5a78185170",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -220,
-        140
+        180,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -65,12 +65,12 @@
         "operation": "text",
         "options": {}
       },
-      "id": "1edaba19-f7e9-4896-8154-400416c6fb5e",
+      "id": "0b5ec6cb-c2b9-4fda-91be-a9e0dc68e286",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        -40,
-        140
+        360,
+        0
       ],
       "typeVersion": 1
     },
@@ -88,12 +88,12 @@
         },
         "options": {}
       },
-      "id": "841918c1-015c-4c75-bfd8-36c0fa028172",
+      "id": "86fbbf27-4ff9-4235-89d4-4e4c95c3adbd",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
-        120,
-        140
+        520,
+        0
       ],
       "typeVersion": 3.4
     },
@@ -104,18 +104,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "cdeba58c-f125-4e50-95ae-9d023c96edb9",
+      "id": "d42d309e-effe-44e8-83f5-c574822b0229",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        300,
-        140
+        700,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -133,7 +133,7 @@
               "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
               "name": "=to",
               "type": "string",
-              "value": "={{ $('Zoom: Get participants data').item.json.participants[0].user_email }}"
+              "value": "=hola@uai.edu.pe, mariana.campos@autonomadeica.edu.pe, dany.mejia@autonomadeica.edu.pe, humberto.quispe@autonomadeica.edu.pe, yassir.bonifacio@autonomadeica.edu.pe, susana.atuncar@autonomadeica.edu.pe, angemar@autonomadeica.edu.pe, karina.garcia@autonomadeica.edu.pe"
             },
             {
               "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
@@ -145,49 +145,49 @@
         },
         "options": {}
       },
-      "id": "40d62a4b-4098-4ee5-926d-0bc4d13ba322",
+      "id": "5652221d-74eb-40d5-90fd-7547e99d1883",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        800,
-        140
+        1220,
+        0
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n\n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n\n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n\n  // Participantes\n  let participantes = getSection(\"👥 Participantes\");\n  if (!participantes) {\n    const match = body.match(/\\*\\*👥 Participantes:\\*\\*\\s*(.*?)\\s\\s/);\n    if (match) participantes = match[1].trim();\n  }\n\n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 5px 0; color: #000000;\">${line.trim()}</p>`)\n    .join(\"\\n\");\n\n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px; color: #000000;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${resumen ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la clase:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(resumen)}</p>\n    ` : \"\"}\n\n    ${observacion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Observación sobre la presencia del docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(observacion)}</p>\n    ` : \"\"}\n\n    ${citas ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n      <div style=\"background-color: #f8f8f8; padding: 15px; border-radius: 5px; margin-left: 20px;\">\n        ${citasFormateadas}\n      </div>\n    ` : \"\"}\n\n    ${conclusion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Sugerencias para la mejora docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${conclusionFormateada}</p>\n    ` : \"\"}\n\n    ${participantes ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Participantes:</h2>\n      <ul style=\"list-style-type: none; padding-left: 20px; color: #000000;\">\n        <li>${formatMarkdown(participantes)}</li>\n      </ul>\n    ` : \"\"}\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n\n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n\n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n\n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 5px 0; color: #000000;\">${line.trim()}</p>`)\n    .join(\"\\n\");\n\n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px; color: #000000;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${resumen ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la clase:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(resumen)}</p>\n    ` : \"\"}\n\n    ${observacion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Observación sobre la presencia del docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(observacion)}</p>\n    ` : \"\"}\n\n    ${citas ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n      <div style=\"background-color: #f8f8f8; padding: 15px; border-radius: 5px; margin-left: 20px;\">\n        ${citasFormateadas}\n      </div>\n    ` : \"\"}\n\n    ${conclusion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Sugerencias para la mejora docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${conclusionFormateada}</p>\n    ` : \"\"}\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
       },
-      "id": "2c089bcf-7573-4ef0-8cf6-140906e70861",
+      "id": "b54c9489-b159-4359-b633-69032e17b842",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        980,
-        140
+        1400,
+        0
       ],
       "typeVersion": 2
     },
     {
       "parameters": {
-        "fromEmail": "dante.luque@uai.edu.pe",
+        "fromEmail": "tutor.ia@uai.edu.pe",
         "toEmail": "={{ $json.to }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "8dff74a2-da0b-47c6-ac78-0702054dc48f",
+      "id": "691e07e5-f131-4538-89ac-73f239161448",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        1160,
-        140
+        1580,
+        0
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "Buf55T4UiocNcnwR",
-          "name": "dante.luque@uai.edu.pe"
+          "id": "WHrFKdYAukBTJHKs",
+          "name": "SMTP tutor.ia@uai.edu.pe"
         }
       }
     },
@@ -199,18 +199,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "934684a8-6841-49ac-b331-c9671c46e867",
+      "id": "d848cfe9-80a1-46fb-be07-3fa4f0a8e12d",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -580,
-        160
+        -200,
+        20
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       },
       "onError": "continueErrorOutput"
@@ -218,37 +218,17 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n**Participantes registrados:**  \n{{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n**👥 Participantes:** [Lista con nombres y correos]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
+        "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
         "options": {}
       },
-      "id": "9a40cd9e-cb75-4cc1-b11e-76a41f2b3e93",
+      "id": "3172712a-671f-4a6b-9842-80be91b037c1",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
-        480,
-        140
+        880,
+        0
       ],
       "typeVersion": 1.9
-    },
-    {
-      "parameters": {
-        "model": "qwen/qwq-32b:free",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [
-        -640,
-        780
-      ],
-      "id": "d82f7c66-945b-42d3-a55b-78b31448117c",
-      "name": "OpenRouter Chat Model",
-      "credentials": {
-        "openRouterApi": {
-          "id": "GnWMYarE9YLkQQP2",
-          "name": "OpenRouter key"
-        }
-      }
     },
     {
       "parameters": {
@@ -259,10 +239,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1340,
-        160
+        -960,
+        20
       ],
-      "id": "1a006b06-24f4-43e5-8268-18ad256e14cb",
+      "id": "cbfe51f7-c04f-4cbb-85a1-a3baba6515e2",
       "name": "recording-completed",
       "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
     },
@@ -273,12 +253,12 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "fbea37b0-a806-4ecc-9727-042ac4988790",
+      "id": "4c1ad1b2-af85-4266-b658-c58f4832b163",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -960,
-        160
+        -580,
+        20
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -286,8 +266,8 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -303,14 +283,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        460,
-        360
+        860,
+        220
       ],
-      "id": "9434aa9b-d9b9-4c44-a3c7-f270c6b61de9",
+      "id": "8c0dc68e-6b60-494f-934e-0d27d07eface",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "QmTgzEmdTeYzjlTn",
+          "id": "sfJcS7f5MZWQ5awr",
           "name": "OpenAi account"
         }
       }
@@ -325,15 +305,15 @@
       "type": "n8n-nodes-base.zoom",
       "typeVersion": 1,
       "position": [
-        -1140,
-        1040
+        -760,
+        640
       ],
-      "id": "fdfcc6f9-30b9-485f-bb48-bb8f948ce25b",
+      "id": "143004f0-d7cf-4f18-82da-41384bfa45cc",
       "name": "Get many meetings",
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -345,10 +325,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1140,
-        160
+        -760,
+        20
       ],
-      "id": "494980c4-cbf3-4036-8e8c-e4874ef452cb",
+      "id": "346269e3-0297-481b-91db-412257761b5f",
       "name": "basic-info-depuration-I"
     },
     {
@@ -359,10 +339,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -780,
-        160
+        -400,
+        20
       ],
-      "id": "cad6b99e-893b-4c50-91f3-3e5a542c5b13",
+      "id": "78f4c6cb-559a-40b6-8590-5613e3c10917",
       "name": "basic-info-depuration-II"
     },
     {
@@ -372,10 +352,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -960,
-        1040
+        -580,
+        640
       ],
-      "id": "fd163dda-c1ae-4c20-87a6-b93f5e36cf18",
+      "id": "097f9666-4ef4-40aa-a887-79a82c5acac1",
       "name": "add status field"
     },
     {
@@ -387,10 +367,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1340,
-        1040
+        -960,
+        640
       ],
-      "id": "48cf681e-6465-4519-9918-a94e577ba254",
+      "id": "d8fba7b4-2173-4864-ba4a-f5372a08569a",
       "name": "api/reuniones",
       "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
     },
@@ -404,10 +384,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -740,
-        1040
+        -360,
+        640
       ],
-      "id": "fa6d9618-2446-4b31-8a96-f4f47693dea4",
+      "id": "45217ccf-46f3-4765-8343-0ed550e89728",
       "name": "endpoint"
     },
     {
@@ -419,27 +399,12 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1340,
-        580
+        -960,
+        400
       ],
-      "id": "914a2ead-db13-41b2-bbd6-948f9d7be7c9",
+      "id": "186b1947-9ede-4c3c-912e-bc7df93c55b3",
       "name": "meeting-started",
       "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=Actúa como un **asistente virtual amigable y atento**, cuya tarea es **recordar al docente que comparta un formulario de retroalimentación con sus estudiantes** al finalizar su clase. Tu tono debe ser cordial, cercano y claro, evitando tecnicismos o formalismos excesivos. El objetivo es fomentar la participación sin parecer insistente.\n\n---\n\n👋 ¡Hola! {{ $json.hostName }}\nNo olvides compartir este enlace con tus estudiantes al finalizar la clase para que puedan calificar la sesión:  \n👉 https://kzmpxfspwahf3oc79sh4.lite.vusercontent.net/  \n  \n✨ ¡La opinión de nuestros estudiantes es muy importante para seguir mejorando!\n\n",
-        "options": {}
-      },
-      "id": "34c4dd11-690e-4587-94d4-9a98f93acbd2",
-      "name": "send url to the student",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "position": [
-        -560,
-        580
-      ],
-      "typeVersion": 1.9
     },
     {
       "parameters": {
@@ -449,10 +414,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1100,
-        580
+        -720,
+        400
       ],
-      "id": "5b533b6c-5727-4f00-bad3-5f14ae90f8e2",
+      "id": "2c94d0eb-4a55-4bba-a449-9385a033a8c5",
       "name": "basic-info"
     },
     {
@@ -462,18 +427,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "2e338805-60c7-4f18-be30-5984fab6b1c9",
+      "id": "910d657e-d02a-45d9-9edc-47f2ffff5f4b",
       "name": "Zoom: Get participants",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -920,
-        580
+        -540,
+        400
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "OWxxxr25OQpDiUJj",
-          "name": "zoom-bot-uai"
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
         }
       }
     },
@@ -484,10 +449,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -740,
-        580
+        -360,
+        400
       ],
-      "id": "13fa2c09-2f6a-4933-911d-0c27fbad80e2",
+      "id": "066cde37-481a-46e1-92b7-f1ce7779acd6",
       "name": "get-host"
     },
     {
@@ -510,7 +475,7 @@
               "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
               "name": "body",
               "type": "string",
-              "value": "={{ $json.output }}"
+              "value": "=<html>\n  <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n    <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n      <h2 style=\"color: #3498db;\">¡Hola, {{ $json.hostName }}! 😄</h2>\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        Solo un recordatorio: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n      </p>\n\n      <p style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"https://kzmkma7an1v3wzcld2kj.lite.vusercontent.net/\" \n           style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n          👉 Formulario de retroalimentación\n        </a>\n      </p>\n\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n      </p>\n\n      <p style=\"font-style: italic; color: #666;\">\n        No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n      </p>\n    </div>\n  </body>\n</html>\n"
             },
             {
               "id": "de580983-c982-46c8-94c2-395580b1bee7",
@@ -522,49 +487,49 @@
         },
         "options": {}
       },
-      "id": "595769dc-cc5e-4a85-84f0-8464bcee8975",
+      "id": "64fbb5df-c9a4-4715-834f-01fd95141a6f",
       "name": "Sort for mail",
       "type": "n8n-nodes-base.set",
       "position": [
-        -220,
-        580
+        -160,
+        400
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const bodyText = item.json.body;\n\n  const html = `\n  <html>\n    <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n      <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n        <h2 style=\"color: #3498db;\">¡Hola, profesor/a! 😄</h2>\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          Solo un recordatorio dulce: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n        </p>\n\n        <p style=\"text-align: center; margin: 30px 0;\">\n          <a href=\"https://kzmpxfspwahf3oc79sh4.lite.vusercontent.net/\" \n             style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n            👉 Formulario de retroalimentación\n          </a>\n        </p>\n\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n        </p>\n\n        <p style=\"font-style: italic; color: #666;\">\n          No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n        </p>\n      </div>\n    </body>\n  </html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    }\n  });\n}\n\nreturn items;\n"
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const hostName = $('get-host').first().json.hostName;\n  const formLink = \"https://kzmkma7an1v3wzcld2kj.lite.vusercontent.net/\";\n\n  const html = `\n  <html>\n    <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n      <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n        <h2 style=\"color: #3498db;\">¡Hola, ${hostName}! 😄</h2>\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          Solo un recordatorio: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n        </p>\n\n        <p style=\"text-align: center; margin: 30px 0;\">\n          <a href=\"${formLink}\" \n             style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n            👉 Formulario de retroalimentación\n          </a>\n        </p>\n\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n        </p>\n\n        <p style=\"font-style: italic; color: #666;\">\n          No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n        </p>\n      </div>\n    </body>\n  </html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    }\n  });\n}\n\nreturn items;\n"
       },
-      "id": "b56544c8-9aa4-4329-b657-4d14531205bf",
+      "id": "9f628d79-ccdb-48f2-8881-044f2d4e91cf",
       "name": "to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        0,
-        580
+        60,
+        400
       ],
       "typeVersion": 2
     },
     {
       "parameters": {
-        "fromEmail": "dante.luque@uai.edu.pe",
+        "fromEmail": "tutor.ia@uai.edu.pe",
         "toEmail": "={{ $json.to }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "1ed841d6-eea2-4f7f-a0cb-5896049182b2",
+      "id": "79240d25-db2b-4243-8e88-44955a8ef8a4",
       "name": "Send url for students",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        200,
-        580
+        260,
+        400
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "Buf55T4UiocNcnwR",
-          "name": "dante.luque@uai.edu.pe"
+          "id": "WHrFKdYAukBTJHKs",
+          "name": "SMTP tutor.ia@uai.edu.pe"
         }
       }
     }
@@ -765,17 +730,6 @@
         ]
       ]
     },
-    "OpenRouter Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "send url to the student",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "meeting-started": {
       "main": [
         [
@@ -798,17 +752,6 @@
         ]
       ]
     },
-    "send url to the student": {
-      "main": [
-        [
-          {
-            "node": "Sort for mail",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Zoom: Get participants": {
       "main": [
         [
@@ -824,7 +767,7 @@
       "main": [
         [
           {
-            "node": "send url to the student",
+            "node": "Sort for mail",
             "type": "main",
             "index": 0
           }
@@ -854,15 +797,15 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "fd299775-7186-4cad-8417-db879a66c77b",
+  "versionId": "6155250a-d1d5-4856-8d44-4471b4501055",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "454729db38a816ba17672547d891b9ee997c0a89a7f27101f45250cd2fd3ecb5"
+    "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
   },
-  "id": "aXFVxl6goUgEnoAk",
+  "id": "bI7bsPaowQ7D3Y34",
   "tags": []
 }
