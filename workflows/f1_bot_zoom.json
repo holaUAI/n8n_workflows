@@ -5,12 +5,12 @@
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "2b5d80a4-7d2b-4bb5-a773-5ffaca2190bc",
+      "id": "6d6ea376-2d55-448b-ba2c-e1e8f6525a55",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
-        -320,
-        400
+        -380,
+        320
       ],
       "typeVersion": 1
     },
@@ -28,28 +28,15 @@
         },
         "options": {}
       },
-      "id": "66da0210-6066-457f-bcc3-1af98e9859ca",
+      "id": "bd37955d-1df6-4811-855b-8e73ae92851b",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
-        -260,
+        -380,
         140
       ],
       "typeVersion": 3.4,
       "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "id": "f3ad0404-4b14-4398-a1cb-2aa272573c06",
-      "name": "Filter: Only 1 item",
-      "type": "n8n-nodes-base.splitInBatches",
-      "position": [
-        -60,
-        240
-      ],
-      "typeVersion": 3
     },
     {
       "parameters": {
@@ -58,18 +45,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "39f1feab-12f2-47ab-96a6-4bb56ebc6417",
+      "id": "e0f9df44-1f63-48d0-ac56-a9e9a16d4caa",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        120,
-        100
+        -220,
+        140
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -78,12 +65,12 @@
         "operation": "text",
         "options": {}
       },
-      "id": "593331c7-f4a4-4900-9ab1-4ce4f2d5e3ab",
+      "id": "1edaba19-f7e9-4896-8154-400416c6fb5e",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        300,
-        180
+        -40,
+        140
       ],
       "typeVersion": 1
     },
@@ -101,34 +88,34 @@
         },
         "options": {}
       },
-      "id": "8b0bccb8-cb57-43ab-87dd-4a5d5ca9f2bc",
+      "id": "841918c1-015c-4c75-bfd8-36c0fa028172",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
-        500,
-        240
+        120,
+        140
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info').item.json.meetingId }}/participants",
+        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info-depuration-I').item.json.meetingId }}/participants",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "6086aff8-ebaf-4ea9-a5eb-b66d3ec46b72",
+      "id": "cdeba58c-f125-4e50-95ae-9d023c96edb9",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        700,
-        180
+        300,
+        140
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -158,25 +145,25 @@
         },
         "options": {}
       },
-      "id": "e6e4da6f-587c-4b61-a109-045f43fcc0a5",
+      "id": "40d62a4b-4098-4ee5-926d-0bc4d13ba322",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        1280,
-        220
+        800,
+        140
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  // 🔧 Función para convertir markdown básico a HTML\n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negritas\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n\n  // 🔍 Extraer título desde la sección Fecha\n  const titleMatch = body.match(/\\*\\*[^]*?Fecha:\\*\\*\\s*(.*?)\\s{2,}/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  // 🔍 Extraer hora de inicio\n  const horaInicioMatch = body.match(/\\*\\*[^]*?Hora de inicio y fin:\\*\\*\\s*(.*?)\\s{2,}/);\n  const horaInicio = horaInicioMatch ? horaInicioMatch[1].trim() : \"\";\n\n  // 🔧 Función robusta para extraer cualquier sección ignorando emojis u otros caracteres previos\n  const getSection = (title) => {\n    const regex = new RegExp(\n      `\\\\*\\\\*[^\\\\*\\\\n]*?${title}:\\\\*\\\\*[\\\\s\\\\S]*?(?=\\\\n\\\\*\\\\*|\\\\n---|\\\\n$)`,\n      \"i\"\n    );\n    const match = body.match(regex);\n    return match\n      ? match[0].replace(new RegExp(`\\\\*\\\\*[^\\\\*\\\\n]*?${title}:\\\\*\\\\*`, \"i\"), \"\").trim()\n      : \"\";\n  };\n\n  const participantes = getSection(\"Participantes\");\n  const resumen = getSection(\"Resumen general de la clase\");\n  const citas = getSection(\"Intervenciones destacadas o citas relevantes\");\n  const observacion = getSection(\"Observación sobre presencia del docente\");\n  const conclusion = getSection(\"Sugerencias para la mejora docente\"); // Título nuevo con emoji 🌟\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${\n      horaInicio\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Hora de inicio:</h2>\n    <p style=\"margin-left: 20px;\">${formatMarkdown(horaInicio)}</p>`\n        : \"\"\n    }\n\n    ${\n      participantes\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Participantes:</h2>\n    <ul style=\"list-style-type: none; padding-left: 20px;\">\n    ${participantes\n      .split(\"\\n\")\n      .map((p) => `<li>${formatMarkdown(p.replace(\"- \", \"\").trim())}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n    ${\n      resumen\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la clase:</h2>\n    <p style=\"margin-left: 20px;\">${formatMarkdown(resumen)}</p>`\n        : \"\"\n    }\n\n    ${\n      citas\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n    <ul style=\"margin-left: 20px;\">\n    ${citas\n      .split(\"\\n\")\n      .filter((p) => p.trim() !== \"\")\n      .map((p) => `<li>${formatMarkdown(p.trim().replace(/^[-–—]\\s*/, \"\"))}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n    ${\n      observacion\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Observación sobre la presencia del docente:</h2>\n    <p style=\"margin-left: 20px;\">${formatMarkdown(observacion)}</p>`\n        : \"\"\n    }\n\n    ${\n      conclusion\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Sugerencias para la mejora docente:</h2>\n    <p style=\"margin-left: 20px;\">${formatMarkdown(conclusion)}</p>`\n        : \"\"\n    }\n\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n\n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n\n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n\n  // Participantes\n  let participantes = getSection(\"👥 Participantes\");\n  if (!participantes) {\n    const match = body.match(/\\*\\*👥 Participantes:\\*\\*\\s*(.*?)\\s\\s/);\n    if (match) participantes = match[1].trim();\n  }\n\n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 5px 0; color: #000000;\">${line.trim()}</p>`)\n    .join(\"\\n\");\n\n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px; color: #000000;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${resumen ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la clase:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(resumen)}</p>\n    ` : \"\"}\n\n    ${observacion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Observación sobre la presencia del docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(observacion)}</p>\n    ` : \"\"}\n\n    ${citas ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n      <div style=\"background-color: #f8f8f8; padding: 15px; border-radius: 5px; margin-left: 20px;\">\n        ${citasFormateadas}\n      </div>\n    ` : \"\"}\n\n    ${conclusion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Sugerencias para la mejora docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${conclusionFormateada}</p>\n    ` : \"\"}\n\n    ${participantes ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Participantes:</h2>\n      <ul style=\"list-style-type: none; padding-left: 20px; color: #000000;\">\n        <li>${formatMarkdown(participantes)}</li>\n      </ul>\n    ` : \"\"}\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
       },
-      "id": "14b62c6d-0746-4f54-90e2-65f6444c9d9b",
+      "id": "2c089bcf-7573-4ef0-8cf6-140906e70861",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        1460,
-        160
+        980,
+        140
       ],
       "typeVersion": 2
     },
@@ -188,19 +175,19 @@
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "77f2954d-93db-4b2b-ac5d-d99f26b82fc1",
+      "id": "8dff74a2-da0b-47c6-ac78-0702054dc48f",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        1640,
-        320
+        1160,
+        140
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "0Wmnl8T7UfTjqSNn",
-          "name": "SMTP dante.luque.edu.pe"
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
         }
       }
     },
@@ -212,18 +199,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "d082df5f-2e27-4c56-a5fb-b7fb2e547808",
+      "id": "934684a8-6841-49ac-b331-c9671c46e867",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -480,
-        260
+        -580,
+        160
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       },
       "onError": "continueErrorOutput"
@@ -231,14 +218,14 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Actúa como un supervisor académico que evalúa de manera crítica pero constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal de la sesión y brindar un análisis claro, profesional y objetivo del desarrollo de la clase, destacando tanto aspectos que deben mejorar como oportunidades de crecimiento docente.\n\nSé formal, claro y exigente, pero mantén un tono positivo y orientado a la mejora. No sanciones, guía. Ofrece sugerencias motivadoras al final, usando un lenguaje que inspire compromiso con la enseñanza de calidad.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-2').item.json.startTimeLocal }}\n- **Hora en la que el host inició la reunión:** {{ $('basic-info').item.json.startTimeLocal }}\n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):\n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):\n{{ $('Format transcript text').item.json.transcript }}\n\n**Participantes registrados:**\n{{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n**📝 Acta de Reunión**\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n**👥 Participantes:** [Lista con nombres y correos]  \n\n---\n\n**📚 Resumen general de la clase:**  \nResume de manera clara los temas abordados (si los hay) y analiza si la clase tuvo estructura, claridad en los objetivos, materiales, participación y ritmo.  \nEnfatiza aspectos positivos como puntualidad del docente, disposición a iniciar a tiempo, uso de la plataforma, etc.  \nSi detectas aspectos críticos como falta de planificación o contenido débil, menciona con cortesía, usando un tono de oportunidad de mejora.  \nEjemplo: _\"Se identificaron áreas de mejora en la conducción de la clase, especialmente en cuanto al enfoque didáctico y uso de recursos.\"_  \nUsa **negrita** para señalar hallazgos clave.\n\n---\n\n**💬 Intervenciones destacadas o citas relevantes:**  \nIncluye frases textuales que demuestren el tono de la sesión, tanto positivas como aspectos a revisar. Si hay participación activa, resáltala.\n\n---\n\n**🔎 Observación sobre la presencia del docente:**  \n1. Indica la hora en que el docente inició la reunión según el registro (`{{ $('basic-info').item.json.startTimeLocal }}`)  \n2. Especifica el **momento exacto (en segundos)** desde el inicio de la grabación en que el docente realizó su **primera intervención verbal**, usando el transcript crudo.  \n3. Evalúa si intervino dentro de los primeros 5 minutos y señala si eso evidencia puntualidad o retraso.  \n4. Si fue puntual pero sin enfoque claro, exprésalo como **una oportunidad de orientar mejor esa energía inicial hacia los objetivos del curso.**\n\n---\n\n**🌟 Sugerencias para la mejora docente:**  \nBrinda recomendaciones claras, con emojis y lenguaje positivo. Por ejemplo:\n\n- 📌 **Planificar mejor la estructura de la clase**, definiendo con claridad introducción, desarrollo y cierre.  \n- 🎯 **Presentar el objetivo de la sesión al inicio**, de forma breve y motivadora.  \n- 🧰 **Apoyarse en materiales o recursos visuales** para facilitar la comprensión.  \n- 🧑‍🏫 **Fomentar una participación alineada al tema**, guiando a los estudiantes.  \n- 📅 **Ensayar la clase para mejorar fluidez y organización** del tiempo.\n\nFinaliza con una frase motivadora:\n\n> ✨ ¡Cada clase es una oportunidad para crecer! Con dedicación y claridad, esta sesión puede convertirse en una experiencia enriquecedora para todos. ¡Ánimo y adelante!\n\n---\n\n**Instrucciones finales:**\n- Usa **negrita** para resaltar ideas clave.\n- Usa emojis con coherencia profesional.\n- Sé claro, imparcial, realista y constructivo.\n- No inventes datos si no están presentes.\n",
+        "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n**Participantes registrados:**  \n{{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n**👥 Participantes:** [Lista con nombres y correos]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
         "options": {}
       },
-      "id": "b305c0a3-5acd-4756-a2ac-af9ea6aea6e8",
+      "id": "9a40cd9e-cb75-4cc1-b11e-76a41f2b3e93",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
-        920,
+        480,
         140
       ],
       "typeVersion": 1.9
@@ -251,18 +238,17 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        540,
-        560
+        -640,
+        780
       ],
-      "id": "112b6ac7-d715-41d5-bfd3-ee1d8c115254",
+      "id": "d82f7c66-945b-42d3-a55b-78b31448117c",
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "E6M0X8KXICCAroWG",
-          "name": "OpenRouter apikey"
+          "id": "GnWMYarE9YLkQQP2",
+          "name": "OpenRouter key"
         }
-      },
-      "disabled": true
+      }
     },
     {
       "parameters": {
@@ -273,10 +259,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1300,
-        540
+        -1340,
+        160
       ],
-      "id": "e1bbb747-6f74-4538-a229-9b62ae9589b2",
+      "id": "1a006b06-24f4-43e5-8268-18ad256e14cb",
       "name": "recording-completed",
       "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
     },
@@ -287,12 +273,12 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "a6ac3b3b-ef1b-41ec-98e9-761081171e04",
+      "id": "fbea37b0-a806-4ecc-9727-042ac4988790",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -920,
-        380
+        -960,
+        160
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -300,41 +286,10 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
-    },
-    {
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -1140,
-        460
-      ],
-      "id": "0e251cf7-bea1-4716-b1ac-f6e1e55e7b63",
-      "name": "basic-info"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "meeting-started",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [
-        -1280,
-        800
-      ],
-      "id": "51ccdf03-a7ed-42f9-86c6-b0ee65af58aa",
-      "name": "meeting-started",
-      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3",
-      "disabled": true
     },
     {
       "parameters": {
@@ -348,17 +303,53 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        860,
-        380
+        460,
+        360
       ],
-      "id": "f71cddb0-811a-466c-9163-3b292be9c23e",
+      "id": "9434aa9b-d9b9-4c44-a3c7-f270c6b61de9",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "sfJcS7f5MZWQ5awr",
+          "id": "QmTgzEmdTeYzjlTn",
           "name": "OpenAi account"
         }
       }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.zoom",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        1040
+      ],
+      "id": "fdfcc6f9-30b9-485f-bb48-bb8f948ce25b",
+      "name": "Get many meetings",
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1140,
+        160
+      ],
+      "id": "494980c4-cbf3-4036-8e8c-e4874ef452cb",
+      "name": "basic-info-depuration-I"
     },
     {
       "parameters": {
@@ -368,11 +359,214 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -700,
-        320
+        -780,
+        160
       ],
-      "id": "411e4848-9762-4c4b-87a9-f25aae409e20",
-      "name": "basic-info-2"
+      "id": "cad6b99e-893b-4c50-91f3-3e5a542c5b13",
+      "name": "basic-info-depuration-II"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .map(item => {\n    const now = new Date();\n    const start = new Date(item.json.start_time);\n    const end = new Date(start.getTime() + item.json.duration * 60000);\n\n    let estado = '';\n\n    if (now < start) {\n      estado = 'pendiente';\n    } else if (now >= start && now <= end) {\n      estado = 'en curso';\n    } else {\n      estado = 'finalizado';\n    }\n\n    return {\n      json: {\n        ...item.json,\n        estado,\n      }\n    };\n  });\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        1040
+      ],
+      "id": "fd163dda-c1ae-4c20-87a6-b93f5e36cf18",
+      "name": "add status field"
+    },
+    {
+      "parameters": {
+        "path": "/api/reuniones",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1340,
+        1040
+      ],
+      "id": "48cf681e-6465-4519-9918-a94e577ba254",
+      "name": "api/reuniones",
+      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -740,
+        1040
+      ],
+      "id": "fa6d9618-2446-4b31-8a96-f4f47693dea4",
+      "name": "endpoint"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-started",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1340,
+        580
+      ],
+      "id": "914a2ead-db13-41b2-bbd6-948f9d7be7c9",
+      "name": "meeting-started",
+      "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como un **asistente virtual amigable y atento**, cuya tarea es **recordar al docente que comparta un formulario de retroalimentación con sus estudiantes** al finalizar su clase. Tu tono debe ser cordial, cercano y claro, evitando tecnicismos o formalismos excesivos. El objetivo es fomentar la participación sin parecer insistente.\n\n---\n\n👋 ¡Hola! {{ $json.hostName }}\nNo olvides compartir este enlace con tus estudiantes al finalizar la clase para que puedan calificar la sesión:  \n👉 https://kzmpxfspwahf3oc79sh4.lite.vusercontent.net/  \n  \n✨ ¡La opinión de nuestros estudiantes es muy importante para seguir mejorando!\n\n",
+        "options": {}
+      },
+      "id": "34c4dd11-690e-4587-94d4-9a98f93acbd2",
+      "name": "send url to the student",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -560,
+        580
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1100,
+        580
+      ],
+      "id": "5b533b6c-5727-4f00-bad3-5f14ae90f8e2",
+      "name": "basic-info"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info').item.json.meetingId }}/participants",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zoomOAuth2Api",
+        "options": {}
+      },
+      "id": "2e338805-60c7-4f18-be30-5984fab6b1c9",
+      "name": "Zoom: Get participants",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -920,
+        580
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const hostId = $('basic-info').item.json.hostId;\nconst participantes = $json.participants;\n\nconst anfitrion = participantes.find(p => p.id === hostId);\n\nreturn {\n  json: {\n    hostEmail: anfitrion?.user_email || null,\n    hostName: anfitrion?.name || null,\n    hostId: anfitrion?.id || null\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        580
+      ],
+      "id": "13fa2c09-2f6a-4933-911d-0c27fbad80e2",
+      "name": "get-host"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc51b7e4-d5c2-4cd4-9488-4d181eaaa02e",
+              "name": "subject",
+              "type": "string",
+              "value": "=!Hola! Permite que tus alumnos califiquen tu clase de hoy😄"
+            },
+            {
+              "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
+              "name": "=to",
+              "type": "string",
+              "value": "={{ $('get-host').item.json.hostEmail }}"
+            },
+            {
+              "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
+              "name": "body",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "id": "de580983-c982-46c8-94c2-395580b1bee7",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "595769dc-cc5e-4a85-84f0-8464bcee8975",
+      "name": "Sort for mail",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -220,
+        580
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const bodyText = item.json.body;\n\n  const html = `\n  <html>\n    <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n      <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n        <h2 style=\"color: #3498db;\">¡Hola, profesor/a! 😄</h2>\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          Solo un recordatorio dulce: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n        </p>\n\n        <p style=\"text-align: center; margin: 30px 0;\">\n          <a href=\"https://kzmpxfspwahf3oc79sh4.lite.vusercontent.net/\" \n             style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n            👉 Formulario de retroalimentación\n          </a>\n        </p>\n\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n        </p>\n\n        <p style=\"font-style: italic; color: #666;\">\n          No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n        </p>\n      </div>\n    </body>\n  </html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    }\n  });\n}\n\nreturn items;\n"
+      },
+      "id": "b56544c8-9aa4-4329-b657-4d14531205bf",
+      "name": "to html",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        0,
+        580
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "fromEmail": "dante.luque@uai.edu.pe",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "1ed841d6-eea2-4f7f-a0cb-5896049182b2",
+      "name": "Send url for students",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        200,
+        580
+      ],
+      "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
+      "typeVersion": 2.1,
+      "credentials": {
+        "smtp": {
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -388,29 +582,11 @@
         ]
       ]
     },
-    "Filter: Only 1 item": {
-      "main": [
-        [
-          {
-            "node": "Filter: Only 1 item",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Zoom: Get transcript file",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Filter transcript URL": {
       "main": [
         [
           {
-            "node": "Filter: Only 1 item",
+            "node": "Zoom: Get transcript file",
             "type": "main",
             "index": 0
           }
@@ -501,16 +677,11 @@
         ]
       ]
     },
-    "OpenRouter Chat Model": {
-      "ai_languageModel": [
-        []
-      ]
-    },
     "Zoom: Get data by meetingId": {
       "main": [
         [
           {
-            "node": "basic-info-2",
+            "node": "basic-info-depuration-II",
             "type": "main",
             "index": 0
           }
@@ -518,6 +689,94 @@
       ]
     },
     "recording-completed": {
+      "main": [
+        [
+          {
+            "node": "basic-info-depuration-I",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create meeting summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many meetings": {
+      "main": [
+        [
+          {
+            "node": "add status field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "basic-info-depuration-I": {
+      "main": [
+        [
+          {
+            "node": "Zoom: Get data by meetingId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "basic-info-depuration-II": {
+      "main": [
+        [
+          {
+            "node": "Zoom: Get transcripts data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add status field": {
+      "main": [
+        [
+          {
+            "node": "endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "api/reuniones": {
+      "main": [
+        [
+          {
+            "node": "Get many meetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "send url to the student",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-started": {
       "main": [
         [
           {
@@ -532,34 +791,62 @@
       "main": [
         [
           {
-            "node": "Zoom: Get data by meetingId",
+            "node": "Zoom: Get participants",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "meeting-started": {
+    "send url to the student": {
       "main": [
-        []
-      ]
-    },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
         [
           {
-            "node": "Create meeting summary",
-            "type": "ai_languageModel",
+            "node": "Sort for mail",
+            "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "basic-info-2": {
+    "Zoom: Get participants": {
       "main": [
         [
           {
-            "node": "Zoom: Get transcripts data",
+            "node": "get-host",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-host": {
+      "main": [
+        [
+          {
+            "node": "send url to the student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort for mail": {
+      "main": [
+        [
+          {
+            "node": "to html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "to html": {
+      "main": [
+        [
+          {
+            "node": "Send url for students",
             "type": "main",
             "index": 0
           }
@@ -567,15 +854,15 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8af3fb0e-b07e-4051-b119-0725f983d3de",
+  "versionId": "fd299775-7186-4cad-8417-db879a66c77b",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
+    "instanceId": "454729db38a816ba17672547d891b9ee997c0a89a7f27101f45250cd2fd3ecb5"
   },
-  "id": "67mwO3ZHVWS2KiSs",
+  "id": "aXFVxl6goUgEnoAk",
   "tags": []
 }
