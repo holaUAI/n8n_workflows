@@ -1,5 +1,5 @@
 {
-  "name": "f1_bot_zoom",
+  "name": "bot_zoom",
   "nodes": [
     {
       "parameters": {
@@ -297,28 +297,6 @@
     },
     {
       "parameters": {
-        "authentication": "oAuth2",
-        "operation": "getAll",
-        "returnAll": true,
-        "filters": {}
-      },
-      "type": "n8n-nodes-base.zoom",
-      "typeVersion": 1,
-      "position": [
-        -760,
-        640
-      ],
-      "id": "143004f0-d7cf-4f18-82da-41384bfa45cc",
-      "name": "Get many meetings",
-      "credentials": {
-        "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
-        }
-      }
-    },
-    {
-      "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
       },
@@ -347,51 +325,6 @@
     },
     {
       "parameters": {
-        "jsCode": "return items\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .map(item => {\n    const now = new Date();\n    const start = new Date(item.json.start_time);\n    const end = new Date(start.getTime() + item.json.duration * 60000);\n\n    let estado = '';\n\n    if (now < start) {\n      estado = 'pendiente';\n    } else if (now >= start && now <= end) {\n      estado = 'en curso';\n    } else {\n      estado = 'finalizado';\n    }\n\n    return {\n      json: {\n        ...item.json,\n        estado,\n      }\n    };\n  });\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -580,
-        640
-      ],
-      "id": "097f9666-4ef4-40aa-a887-79a82c5acac1",
-      "name": "add status field"
-    },
-    {
-      "parameters": {
-        "path": "/api/reuniones",
-        "responseMode": "responseNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [
-        -960,
-        640
-      ],
-      "id": "d8fba7b4-2173-4864-ba4a-f5372a08569a",
-      "name": "api/reuniones",
-      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
-    },
-    {
-      "parameters": {
-        "respondWith": "allIncomingItems",
-        "options": {
-          "responseCode": 200
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
-      "position": [
-        -360,
-        640
-      ],
-      "id": "45217ccf-46f3-4765-8343-0ed550e89728",
-      "name": "endpoint"
-    },
-    {
-      "parameters": {
         "httpMethod": "POST",
         "path": "meeting-started",
         "options": {}
@@ -399,61 +332,12 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -960,
-        400
+        -980,
+        480
       ],
       "id": "186b1947-9ede-4c3c-912e-bc7df93c55b3",
       "name": "meeting-started",
       "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
-    },
-    {
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -720,
-        400
-      ],
-      "id": "2c94d0eb-4a55-4bba-a449-9385a033a8c5",
-      "name": "basic-info"
-    },
-    {
-      "parameters": {
-        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info').item.json.meetingId }}/participants",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "zoomOAuth2Api",
-        "options": {}
-      },
-      "id": "910d657e-d02a-45d9-9edc-47f2ffff5f4b",
-      "name": "Zoom: Get participants",
-      "type": "n8n-nodes-base.httpRequest",
-      "position": [
-        -540,
-        400
-      ],
-      "typeVersion": 4.2,
-      "credentials": {
-        "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const hostId = $('basic-info').item.json.hostId;\nconst participantes = $json.participants;\n\nconst anfitrion = participantes.find(p => p.id === hostId);\n\nreturn {\n  json: {\n    hostEmail: anfitrion?.user_email || null,\n    hostName: anfitrion?.name || null,\n    hostId: anfitrion?.id || null\n  }\n};\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -360,
-        400
-      ],
-      "id": "066cde37-481a-46e1-92b7-f1ce7779acd6",
-      "name": "get-host"
     },
     {
       "parameters": {
@@ -469,13 +353,13 @@
               "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
               "name": "=to",
               "type": "string",
-              "value": "={{ $('get-host').item.json.hostEmail }}"
+              "value": "={{ $json.meeting.host.email }}"
             },
             {
               "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
               "name": "body",
               "type": "string",
-              "value": "=<html>\n  <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n    <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n      <h2 style=\"color: #3498db;\">¡Hola, {{ $json.hostName }}! 😄</h2>\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        Solo un recordatorio: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n      </p>\n\n      <p style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"https://kzmkma7an1v3wzcld2kj.lite.vusercontent.net/\" \n           style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n          👉 Formulario de retroalimentación\n        </a>\n      </p>\n\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n      </p>\n\n      <p style=\"font-style: italic; color: #666;\">\n        No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n      </p>\n    </div>\n  </body>\n</html>\n"
+              "value": "=<html>\n  <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n    <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n      <h2 style=\"color: #3498db;\">¡Hola, {{ $json.host.hostName }}! 😄</h2>\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        Solo un recordatorio: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n      </p>\n\n      <p style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"https://kzmkma7an1v3wzcld2kj.lite.vusercontent.net/\" \n           style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n          👉 Formulario de retroalimentación\n        </a>\n      </p>\n\n      <p style=\"font-size: 16px; line-height: 1.6;\">\n        La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n      </p>\n\n      <p style=\"font-style: italic; color: #666;\">\n        No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n      </p>\n    </div>\n  </body>\n</html>\n"
             },
             {
               "id": "de580983-c982-46c8-94c2-395580b1bee7",
@@ -491,38 +375,25 @@
       "name": "Sort for mail",
       "type": "n8n-nodes-base.set",
       "position": [
-        -160,
-        400
+        -400,
+        680
       ],
       "typeVersion": 3.4
-    },
-    {
-      "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const hostName = $('get-host').first().json.hostName;\n  const formLink = \"https://kzmkma7an1v3wzcld2kj.lite.vusercontent.net/\";\n\n  const html = `\n  <html>\n    <body style=\"font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; padding: 30px; color: #333;\">\n      <div style=\"max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px;\">\n        <h2 style=\"color: #3498db;\">¡Hola, ${hostName}! 😄</h2>\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          Solo un recordatorio: cuando termines tu clase, ¿podrías compartir este enlace con tus estudiantes? 🥰\n        </p>\n\n        <p style=\"text-align: center; margin: 30px 0;\">\n          <a href=\"${formLink}\" \n             style=\"display: inline-block; background-color: #3498db; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;\">\n            👉 Formulario de retroalimentación\n          </a>\n        </p>\n\n        <p style=\"font-size: 16px; line-height: 1.6;\">\n          La opinión de tus estudiantes nos ayuda a crecer juntos y a que sus sesiones sean cada vez más dinámicas.\n        </p>\n\n        <p style=\"font-style: italic; color: #666;\">\n          No hay prisa, pero recuerda que un pequeño gesto de tu parte impulsa mucho nuestro trabajo conjunto. ¡Gracias por tu dedicación! 💪✨\n        </p>\n      </div>\n    </body>\n  </html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    }\n  });\n}\n\nreturn items;\n"
-      },
-      "id": "9f628d79-ccdb-48f2-8881-044f2d4e91cf",
-      "name": "to html",
-      "type": "n8n-nodes-base.code",
-      "position": [
-        60,
-        400
-      ],
-      "typeVersion": 2
     },
     {
       "parameters": {
         "fromEmail": "tutor.ia@uai.edu.pe",
         "toEmail": "={{ $json.to }}",
         "subject": "={{ $json.subject }}",
-        "html": "={{ $json.html }}",
+        "html": "={{ $json.body }}",
         "options": {}
       },
       "id": "79240d25-db2b-4243-8e88-44955a8ef8a4",
       "name": "Send url for students",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        260,
-        400
+        -180,
+        680
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
@@ -532,6 +403,111 @@
           "name": "SMTP tutor.ia@uai.edu.pe"
         }
       }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "meetingId": "={{ $json.body.payload.object.id }}",
+        "additionalFields": {}
+      },
+      "id": "55ee8bf0-3e3b-4e42-8838-4422718e58af",
+      "name": "Zoom: Get-data-by-meetingId",
+      "type": "n8n-nodes-base.zoom",
+      "position": [
+        -800,
+        480
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const object = $json;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString(\"es-PE\", options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meeting: {\n      id: object.id,\n      uuid: object.uuid,\n      topic: object.topic,\n      startTime: startTimeLocal,\n      status: object.status,\n      duration: object.duration,\n      host: {\n      id: object.host_id,\n      email: object.host_email,\n    },\n    }\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        480
+      ],
+      "id": "2c94d0eb-4a55-4bba-a449-9385a033a8c5",
+      "name": "meeting-info"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "participant-joined",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        900
+      ],
+      "id": "3a59c7ca-b000-405a-a7e2-37c3153ce899",
+      "name": "participants-joined",
+      "webhookId": "285cc8ab-496b-4780-9f5a-46c9ef5dd1bd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://known-moth-included.ngrok-free.app/ms/v1/meeting/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"status\": \"{{ $json.meeting.status }}\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        480
+      ],
+      "id": "794750dd-87e5-462e-bdad-1bf355498a79",
+      "name": "/ms/v1/meeting/save"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const eventObject = $json.body.payload.object;\nconst participant = eventObject.participant;\n\n// Convertir start_time UTC a hora local (Perú)\nconst joinTimeUTC = new Date(participant.join_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst joinTimeLocal = joinTimeUTC.toLocaleString(\"es-PE\", options);\n\nreturn {\n  json: {\n    meeting: {\n      id: eventObject.id,\n      uuid: eventObject.uuid,\n    },\n    participant: {\n      id: participant.id,\n      user_id: participant.user_id,\n      participant_user_id: participant.participant_user_id || null,\n      user_name: participant.user_name,\n      email: participant.email || null,\n      join_time: joinTimeLocal,\n      isHost: participant.participant_user_id === eventObject.host_id,\n    },\n    host_id: eventObject.host_id,\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        900
+      ],
+      "id": "d7683a24-3d06-4844-8f32-5c2a90af04bf",
+      "name": "participant-info"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://known-moth-included.ngrok-free.app/ms/v1/participant/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"user_id\": \"{{ $json.participant.user_id }}\",\n      \"participant_user_id\": \"{{ $json.participant.participant_user_id }}\",\n      \"user_name\": \"{{ $json.participant.user_name }}\",\n      \"email\": \"{{ $json.participant.email }}\",\n      \"join_time\": \"{{ $json.participant.join_time }}\",\n      \"isHot\": \"{{ $json.participant.isHost }}\",\n      \"host_id\": \"{{ $json.host_id }}\",\n      \"meeting_id\": \"{{ $json.meeting.id }}\",\n      \"meeting_uuid\": \"{{ $json.meeting.uuid }}\"\n    }\n  }\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -520,
+        900
+      ],
+      "id": "b84d7f5a-941b-4207-9374-d41b0f0103fa",
+      "name": "/ms/v1/participant/save"
     }
   ],
   "pinData": {},
@@ -675,17 +651,6 @@
         ]
       ]
     },
-    "Get many meetings": {
-      "main": [
-        [
-          {
-            "node": "add status field",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "basic-info-depuration-I": {
       "main": [
         [
@@ -708,66 +673,11 @@
         ]
       ]
     },
-    "add status field": {
-      "main": [
-        [
-          {
-            "node": "endpoint",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "api/reuniones": {
-      "main": [
-        [
-          {
-            "node": "Get many meetings",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "meeting-started": {
       "main": [
         [
           {
-            "node": "basic-info",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "basic-info": {
-      "main": [
-        [
-          {
-            "node": "Zoom: Get participants",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Zoom: Get participants": {
-      "main": [
-        [
-          {
-            "node": "get-host",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "get-host": {
-      "main": [
-        [
-          {
-            "node": "Sort for mail",
+            "node": "Zoom: Get-data-by-meetingId",
             "type": "main",
             "index": 0
           }
@@ -778,18 +688,56 @@
       "main": [
         [
           {
-            "node": "to html",
+            "node": "Send url for students",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "to html": {
+    "Zoom: Get-data-by-meetingId": {
       "main": [
         [
           {
-            "node": "Send url for students",
+            "node": "meeting-info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-info": {
+      "main": [
+        [
+          {
+            "node": "Sort for mail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "/ms/v1/meeting/save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "participants-joined": {
+      "main": [
+        [
+          {
+            "node": "participant-info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "participant-info": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/participant/save",
             "type": "main",
             "index": 0
           }
@@ -801,7 +749,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6155250a-d1d5-4856-8d44-4471b4501055",
+  "versionId": "a686869d-e8dc-4797-935e-a8d91bdd5c0a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
