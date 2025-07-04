@@ -1,11 +1,11 @@
 {
-  "name": "bot_zoom",
+  "name": "f1_bot_zoom",
   "nodes": [
     {
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "3d0bfdf6-8918-419d-ace7-7659cbcdd0b7",
+      "id": "d85e557e-80a2-449b-9f74-23fa8ad52a88",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
@@ -28,7 +28,7 @@
         },
         "options": {}
       },
-      "id": "82c41eb9-797f-4e6b-b305-743cdf08148f",
+      "id": "07e70c17-af22-4991-add7-f327c41d06a4",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
@@ -45,7 +45,7 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "15e2134c-5ec6-4562-8d43-6f5a78185170",
+      "id": "3d604eb9-57c6-4f7f-9417-c6c526c2c90d",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
@@ -55,8 +55,8 @@
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -65,7 +65,7 @@
         "operation": "text",
         "options": {}
       },
-      "id": "0b5ec6cb-c2b9-4fda-91be-a9e0dc68e286",
+      "id": "187a6a1a-7387-42b2-841b-991cc3a2bece",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
@@ -88,7 +88,7 @@
         },
         "options": {}
       },
-      "id": "86fbbf27-4ff9-4235-89d4-4e4c95c3adbd",
+      "id": "42efe903-a158-4d4a-b24c-94a9d8a6de48",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
@@ -104,7 +104,7 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "d42d309e-effe-44e8-83f5-c574822b0229",
+      "id": "279890ba-78a3-4d7b-8fcc-64e8174f4e31",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
@@ -114,8 +114,8 @@
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -145,7 +145,7 @@
         },
         "options": {}
       },
-      "id": "5652221d-74eb-40d5-90fd-7547e99d1883",
+      "id": "3414220b-d441-48eb-a09a-f775fc8bf670",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
@@ -158,7 +158,7 @@
       "parameters": {
         "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n\n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n\n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n\n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 5px 0; color: #000000;\">${line.trim()}</p>`)\n    .join(\"\\n\");\n\n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px; color: #000000;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${resumen ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la clase:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(resumen)}</p>\n    ` : \"\"}\n\n    ${observacion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Observación sobre la presencia del docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${formatMarkdown(observacion)}</p>\n    ` : \"\"}\n\n    ${citas ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n      <div style=\"background-color: #f8f8f8; padding: 15px; border-radius: 5px; margin-left: 20px;\">\n        ${citasFormateadas}\n      </div>\n    ` : \"\"}\n\n    ${conclusion ? `\n      <h2 style=\"color: #2c3e50; margin-top: 20px;\">Sugerencias para la mejora docente:</h2>\n      <p style=\"margin-left: 20px; color: #000000;\">${conclusionFormateada}</p>\n    ` : \"\"}\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
       },
-      "id": "b54c9489-b159-4359-b633-69032e17b842",
+      "id": "7552faf5-0a85-4449-a7cf-534d7458bba0",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
@@ -175,7 +175,7 @@
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "691e07e5-f131-4538-89ac-73f239161448",
+      "id": "513b3447-675b-42af-bfc7-957901ed5b33",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
@@ -186,8 +186,8 @@
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "WHrFKdYAukBTJHKs",
-          "name": "SMTP tutor.ia@uai.edu.pe"
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
         }
       }
     },
@@ -199,7 +199,7 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "d848cfe9-80a1-46fb-be07-3fa4f0a8e12d",
+      "id": "7b9c9abb-b83f-4a98-aec5-ef90f85d835f",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
@@ -209,8 +209,8 @@
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       },
       "onError": "continueErrorOutput"
@@ -221,7 +221,7 @@
         "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
         "options": {}
       },
-      "id": "3172712a-671f-4a6b-9842-80be91b037c1",
+      "id": "4669c06a-ef05-4299-b146-5eb9e8ffab8b",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
@@ -242,9 +242,10 @@
         -960,
         20
       ],
-      "id": "cbfe51f7-c04f-4cbb-85a1-a3baba6515e2",
+      "id": "8a170272-8d9a-4813-9756-34a5c95fe268",
       "name": "recording-completed",
-      "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
+      "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f",
+      "disabled": true
     },
     {
       "parameters": {
@@ -253,7 +254,7 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "4c1ad1b2-af85-4266-b658-c58f4832b163",
+      "id": "fe40a8fd-ecb8-4bec-92cd-9e395e2ddad0",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
@@ -266,8 +267,8 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -286,11 +287,11 @@
         860,
         220
       ],
-      "id": "8c0dc68e-6b60-494f-934e-0d27d07eface",
+      "id": "4ff2c3bc-b7ce-48a6-8d51-143822077d7e",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "sfJcS7f5MZWQ5awr",
+          "id": "QmTgzEmdTeYzjlTn",
           "name": "OpenAi account"
         }
       }
@@ -306,7 +307,7 @@
         -760,
         20
       ],
-      "id": "346269e3-0297-481b-91db-412257761b5f",
+      "id": "5ac2d1eb-45d9-4a99-a791-d805d9f17cfe",
       "name": "basic-info-depuration-I"
     },
     {
@@ -320,7 +321,7 @@
         -400,
         20
       ],
-      "id": "78f4c6cb-559a-40b6-8590-5613e3c10917",
+      "id": "0da85b08-0d48-4c01-a026-57c98ca019af",
       "name": "basic-info-depuration-II"
     },
     {
@@ -335,7 +336,7 @@
         -980,
         480
       ],
-      "id": "186b1947-9ede-4c3c-912e-bc7df93c55b3",
+      "id": "883dda0f-1e0d-4992-90f7-f0318cf5bab8",
       "name": "meeting-started",
       "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
     },
@@ -371,7 +372,7 @@
         },
         "options": {}
       },
-      "id": "64fbb5df-c9a4-4715-834f-01fd95141a6f",
+      "id": "c1ae1fed-6720-4fc2-a134-b5a7391a76fb",
       "name": "Sort for mail",
       "type": "n8n-nodes-base.set",
       "position": [
@@ -388,7 +389,7 @@
         "html": "={{ $json.body }}",
         "options": {}
       },
-      "id": "79240d25-db2b-4243-8e88-44955a8ef8a4",
+      "id": "1e24c084-58b1-4a19-b1fb-9824fd3fee68",
       "name": "Send url for students",
       "type": "n8n-nodes-base.emailSend",
       "position": [
@@ -399,8 +400,8 @@
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "WHrFKdYAukBTJHKs",
-          "name": "SMTP tutor.ia@uai.edu.pe"
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
         }
       }
     },
@@ -411,7 +412,7 @@
         "meetingId": "={{ $json.body.payload.object.id }}",
         "additionalFields": {}
       },
-      "id": "55ee8bf0-3e3b-4e42-8838-4422718e58af",
+      "id": "87335eb1-22be-4bd4-8f37-a015dce70aaa",
       "name": "Zoom: Get-data-by-meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
@@ -424,8 +425,8 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -440,7 +441,7 @@
         -600,
         480
       ],
-      "id": "2c94d0eb-4a55-4bba-a449-9385a033a8c5",
+      "id": "d8a92a38-df51-4202-a95b-454ef8d92071",
       "name": "meeting-info"
     },
     {
@@ -453,9 +454,9 @@
       "typeVersion": 2,
       "position": [
         -960,
-        900
+        940
       ],
-      "id": "3a59c7ca-b000-405a-a7e2-37c3153ce899",
+      "id": "ae16572b-dae7-4448-aaf1-3a01927c0f0d",
       "name": "participants-joined",
       "webhookId": "285cc8ab-496b-4780-9f5a-46c9ef5dd1bd"
     },
@@ -474,7 +475,7 @@
         -400,
         480
       ],
-      "id": "794750dd-87e5-462e-bdad-1bf355498a79",
+      "id": "25bcf500-d5f3-4a4b-8b0f-cd1540de42e1",
       "name": "/ms/v1/meeting/save"
     },
     {
@@ -486,9 +487,9 @@
       "typeVersion": 2,
       "position": [
         -720,
-        900
+        940
       ],
-      "id": "d7683a24-3d06-4844-8f32-5c2a90af04bf",
+      "id": "fe356a1b-6bf0-4ade-98b2-adca3d843080",
       "name": "participant-info"
     },
     {
@@ -497,17 +498,84 @@
         "url": "https://known-moth-included.ngrok-free.app/ms/v1/participant/save",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"user_id\": \"{{ $json.participant.user_id }}\",\n      \"participant_user_id\": \"{{ $json.participant.participant_user_id }}\",\n      \"user_name\": \"{{ $json.participant.user_name }}\",\n      \"email\": \"{{ $json.participant.email }}\",\n      \"join_time\": \"{{ $json.participant.join_time }}\",\n      \"isHot\": \"{{ $json.participant.isHost }}\",\n      \"host_id\": \"{{ $json.host_id }}\",\n      \"meeting_id\": \"{{ $json.meeting.id }}\",\n      \"meeting_uuid\": \"{{ $json.meeting.uuid }}\"\n    }\n  }\n}\n\n",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"user_id\": \"{{ $json.participant.user_id }}\",\n      \"participant_user_id\": \"{{ $json.participant.participant_user_id }}\",\n      \"user_name\": \"{{ $json.participant.user_name }}\",\n      \"email\": \"{{ $json.participant.email }}\",\n      \"join_time\": \"{{ $json.participant.join_time }}\",\n      \"isHost\": {{ $json.participant.isHost }},\n      \"host_id\": \"{{ $json.host_id }}\",\n      \"meeting_id\": \"{{ $json.meeting.id }}\",\n      \"meeting_uuid\": \"{{ $json.meeting.uuid }}\"\n    }\n  }\n}\n\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         -520,
-        900
+        940
       ],
-      "id": "b84d7f5a-941b-4207-9374-d41b0f0103fa",
+      "id": "499f01c7-2ec0-4a9f-8062-ab2d1fcd877a",
       "name": "/ms/v1/participant/save"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.zoom",
+      "typeVersion": 1,
+      "position": [
+        -780,
+        1240
+      ],
+      "id": "afabe5c8-7aa1-42b8-ab4d-54300dbc6175",
+      "name": "Get many meetings",
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .map(item => {\n    const now = new Date();\n    const start = new Date(item.json.start_time);\n    const end = new Date(start.getTime() + item.json.duration * 60000);\n\n    let estado = '';\n\n    if (now < start) {\n      estado = 'pendiente';\n    } else if (now >= start && now <= end) {\n      estado = 'en curso';\n    } else {\n      estado = 'finalizado';\n    }\n\n    return {\n      json: {\n        ...item.json,\n        estado,\n      }\n    };\n  });\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        1240
+      ],
+      "id": "3fdd5dcd-d00f-4c1a-98f4-716d3bfda5a2",
+      "name": "add status field"
+    },
+    {
+      "parameters": {
+        "path": "/api/reuniones/get-all",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        1240
+      ],
+      "id": "e20d0a5b-4176-425e-b0d8-003e5322c5d9",
+      "name": "api/reuniones",
+      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -300,
+        1240
+      ],
+      "id": "79d75992-89aa-46c3-98a7-0610d98f3e9f",
+      "name": "endpoint"
     }
   ],
   "pinData": {},
@@ -743,17 +811,50 @@
           }
         ]
       ]
+    },
+    "Get many meetings": {
+      "main": [
+        [
+          {
+            "node": "add status field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add status field": {
+      "main": [
+        [
+          {
+            "node": "endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "api/reuniones": {
+      "main": [
+        [
+          {
+            "node": "Get many meetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "a686869d-e8dc-4797-935e-a8d91bdd5c0a",
+  "versionId": "f5e47cc7-9ff4-43d4-9378-b85dd6e0d7db",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
+    "instanceId": "454729db38a816ba17672547d891b9ee997c0a89a7f27101f45250cd2fd3ecb5"
   },
-  "id": "bI7bsPaowQ7D3Y34",
+  "id": "jbppfB0PEE3fzyYe",
   "tags": []
 }
