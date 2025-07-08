@@ -149,8 +149,8 @@
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        -1000,
-        -240
+        -920,
+        -220
       ],
       "typeVersion": 3.4
     },
@@ -162,7 +162,7 @@
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        -820,
+        -640,
         -240
       ],
       "typeVersion": 2
@@ -179,7 +179,7 @@
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        -640,
+        -460,
         -240
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
@@ -333,7 +333,7 @@
       "typeVersion": 2,
       "position": [
         -3200,
-        240
+        320
       ],
       "id": "98316a70-67ab-42a5-948e-baedcd28c73d",
       "name": "meeting-started",
@@ -375,8 +375,8 @@
       "name": "Sort for mail",
       "type": "n8n-nodes-base.set",
       "position": [
-        -2380,
-        460
+        -2400,
+        320
       ],
       "typeVersion": 3.4
     },
@@ -392,8 +392,8 @@
       "name": "Send url for students",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        -2160,
-        460
+        -2200,
+        320
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
@@ -416,7 +416,7 @@
       "type": "n8n-nodes-base.zoom",
       "position": [
         -3020,
-        240
+        320
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -438,7 +438,7 @@
       "typeVersion": 2,
       "position": [
         -2820,
-        240
+        320
       ],
       "id": "69cf544f-72be-4c20-8886-f77df17ed858",
       "name": "meeting-info"
@@ -452,8 +452,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3180,
-        740
+        -3200,
+        520
       ],
       "id": "df4ed61e-a691-4aa6-88fc-2e57d0ed1942",
       "name": "participants-joined",
@@ -465,14 +465,14 @@
         "url": "https://known-moth-included.ngrok-free.app/ms/v1/meeting/save",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"status\": \"{{ $json.meeting.status }}\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\"\n    }\n  }\n}",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"status\": \"{{ $json.meeting.status }}\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\",\n    }\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2620,
-        240
+        -2760,
+        140
       ],
       "id": "a0577e52-5c53-44a3-bf2a-63adf85efd80",
       "name": "/ms/v1/meeting/save"
@@ -485,8 +485,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2940,
-        740
+        -2960,
+        520
       ],
       "id": "538d2fd0-7cd9-4811-8642-42f9ffcbae85",
       "name": "participant-info"
@@ -503,8 +503,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2740,
-        740
+        -2760,
+        520
       ],
       "id": "d453e00f-699e-4eb8-bda2-29a8ddcc5e08",
       "name": "/ms/v1/participant/save"
@@ -520,7 +520,7 @@
       "typeVersion": 1,
       "position": [
         -3000,
-        1000
+        720
       ],
       "id": "55d03252-3bd3-481a-8776-25c972ac9538",
       "name": "Get many meetings",
@@ -538,8 +538,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2740,
-        1000
+        -2780,
+        720
       ],
       "id": "d36403af-5ba6-413f-bf96-a1678255cb86",
       "name": "add status field"
@@ -554,7 +554,7 @@
       "typeVersion": 2,
       "position": [
         -3200,
-        1000
+        720
       ],
       "id": "aeff65c4-4465-46a5-b239-452a9761efb3",
       "name": "api/reuniones",
@@ -570,24 +570,89 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -2520,
-        1000
+        -2560,
+        720
       ],
       "id": "0454975a-f25e-4c0a-ae08-6aae6f921440",
       "name": "endpoint"
     },
     {
       "parameters": {
-        "jsCode": "return {\n  formLink: \"https://encuesta-l2blq.web.app/\"\n}"
+        "jsCode": "const uriBase = \"https://encuesta-l2blq.web.app\"\nconst idMeeting = $input.first().json.meeting.id\nconst idHost = $input.first().json.meeting.host.id\n\nreturn {\n  formLink: `${uriBase}/${idMeeting}/${idHost}`\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2600,
-        460
+        -2620,
+        320
       ],
       "id": "dced28b1-6655-41c6-8549-719fa5eb9448",
       "name": "encuesta - link"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc51b7e4-d5c2-4cd4-9488-4d181eaaa02e",
+              "name": "subject",
+              "type": "string",
+              "value": "=📢 Resumen de la Clase: \"{{ $('Zoom: Get data by meetingId').item.json.topic }}\" - {{ DateTime.fromISO($('Zoom: Get data by meetingId').item.json.start_time).toFormat('yyyy-MM-dd HH:mm') }}"
+            },
+            {
+              "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
+              "name": "=to",
+              "type": "string",
+              "value": "=hola@uai.edu.pe"
+            },
+            {
+              "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
+              "name": "body",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4c4d7bf4-f874-4c6f-9384-f49876f8d9a7",
+      "name": "TEST - Sort for mail delivery",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -920,
+        -20
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3200,
+        140
+      ],
+      "id": "0f2bf8bd-7c5b-4b6f-adbe-845ad963438c",
+      "name": "meeting-created",
+      "webhookId": "e16d2b77-53a2-4c2b-a1b0-c184e1118753"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const meeting = $json.body.payload.object;\nconst operatorEmail = $json.body.payload.operator;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(meeting.start_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString(\"es-PE\", options);\n\nreturn {\n  json: {\n    meeting: {\n      id: meeting.id,\n      uuid: meeting.uuid,\n      topic: meeting.topic,\n      startTime: startTimeLocal,\n      status: \"pending\",\n      duration: meeting.duration,\n      host: {\n        id: meeting.host_id,\n        email: operatorEmail || \"\",\n      },\n    },\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2960,
+        140
+      ],
+      "id": "0ca75614-da2a-486f-80e4-9137d5fac716",
+      "name": "meeting-info1"
     }
   ],
   "pinData": {},
@@ -618,7 +683,7 @@
       "main": [
         [
           {
-            "node": "Sort for mail delivery",
+            "node": "TEST - Sort for mail delivery",
             "type": "main",
             "index": 0
           }
@@ -638,13 +703,7 @@
     },
     "Sort for mail delivery": {
       "main": [
-        [
-          {
-            "node": "Format to html",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Zoom: Get transcript file": {
@@ -790,11 +849,6 @@
       "main": [
         [
           {
-            "node": "/ms/v1/meeting/save",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "encuesta - link",
             "type": "main",
             "index": 0
@@ -867,13 +921,46 @@
           }
         ]
       ]
+    },
+    "TEST - Sort for mail delivery": {
+      "main": [
+        [
+          {
+            "node": "Format to html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-created": {
+      "main": [
+        [
+          {
+            "node": "meeting-info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-info1": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/meeting/save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "14fba86a-3996-4c4b-8245-d125aeee913c",
+  "versionId": "47b1b1b5-392e-4b4c-8180-450d422bafd0",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
