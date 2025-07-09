@@ -1,16 +1,16 @@
 {
-  "name": "f1_n8n_zoom",
+  "name": "f1_bot_zoom",
   "nodes": [
     {
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "685fb3c4-9db6-4b1b-8176-a28d3a98b2c7",
+      "id": "d0943ec8-d37f-4693-8649-43ca391a94fd",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
-        -2220,
-        -60
+        0,
+        180
       ],
       "typeVersion": 1
     },
@@ -28,12 +28,12 @@
         },
         "options": {}
       },
-      "id": "c7a8efbd-df49-41b3-adf0-2b88ea7a3f30",
+      "id": "41b746b7-257a-471a-aa35-5a7f9bc4cafc",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
-        -2220,
-        -240
+        0,
+        0
       ],
       "typeVersion": 3.4,
       "onError": "continueRegularOutput"
@@ -45,18 +45,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "f50c465f-ec79-4c7f-8667-a6df1d938e79",
+      "id": "6f4543ef-5492-4572-8ea5-4104b89d90ee",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -2040,
-        -240
+        180,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -65,12 +65,12 @@
         "operation": "text",
         "options": {}
       },
-      "id": "7914e822-2329-4694-a06b-4d1e7a206e9e",
+      "id": "e599329a-314c-4c86-a323-eeaa48fcd8fe",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        -1860,
-        -240
+        360,
+        0
       ],
       "typeVersion": 1
     },
@@ -88,12 +88,12 @@
         },
         "options": {}
       },
-      "id": "843c06bb-37bc-4e26-a31c-69297936b1a7",
+      "id": "2371a88e-e271-4545-8f6e-c76dab847bd1",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
-        -1700,
-        -240
+        520,
+        0
       ],
       "typeVersion": 3.4
     },
@@ -104,18 +104,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "2ca45b86-a705-4363-848d-3b38703fbf51",
+      "id": "fc14bcf9-b8cc-4210-aa19-8b8ea64eb03c",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -1520,
-        -240
+        700,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -145,12 +145,12 @@
         },
         "options": {}
       },
-      "id": "b7a641dd-0590-432f-9bd3-a5e91428564f",
+      "id": "4a6a50d9-b20b-497c-8ebf-2a0b48109201",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        -920,
-        -220
+        1300,
+        20
       ],
       "typeVersion": 3.4
     },
@@ -158,12 +158,12 @@
       "parameters": {
         "jsCode": "const items = [];\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n  \n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n  \n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n  \n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n  \n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n  \n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 8px 0; color: #2c3e50; font-style: italic; position: relative; padding-left: 20px;\">\"${line.trim()}\"</p>`)\n    .join(\"\\n\");\n  \n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n  \n  const html = `\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Acta de Reunión - ${title}</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        \n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            min-height: 100vh;\n            padding: 20px;\n            color: #333;\n        }\n        \n        .container {\n            max-width: 800px;\n            margin: 0 auto;\n            background: white;\n            border-radius: 20px;\n            box-shadow: 0 20px 40px rgba(0,0,0,0.1);\n            overflow: hidden;\n            animation: slideIn 0.8s ease-out;\n        }\n        \n        @keyframes slideIn {\n            from { opacity: 0; transform: translateY(30px); }\n            to { opacity: 1; transform: translateY(0); }\n        }\n        \n        .header {\n            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);\n            padding: 30px;\n            text-align: center;\n            color: white;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .header::before {\n            content: '';\n            position: absolute;\n            top: -50%;\n            left: -50%;\n            width: 200%;\n            height: 200%;\n            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);\n            background-size: 20px 20px;\n            animation: float 20s linear infinite;\n        }\n        \n        @keyframes float {\n            0% { transform: rotate(0deg) translateX(0px); }\n            100% { transform: rotate(360deg) translateX(10px); }\n        }\n        \n        .logo {\n            position: relative;\n            z-index: 2;\n            margin-bottom: 20px;\n        }\n        \n        .logo img {\n            width: 80px;\n            height: 80px;\n            width: auto;\n            height: auto;\n            border-radius: 10px;\n            box-shadow: 0 4px 15px rgba(0,0,0,0.2);\n            background: white;\n            padding: 5px;\n            animation: logoGlow 2s ease-in-out infinite alternate;\n        }\n        \n        @keyframes logoGlow {\n            from { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }\n            to { box-shadow: 0 4px 20px rgba(255,255,255,0.3); }\n        }\n        \n        .header h1 {\n            font-size: 28px;\n            margin-bottom: 10px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .header .date {\n            font-size: 18px;\n            opacity: 0.9;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .content {\n            padding: 40px;\n        }\n        \n        .section {\n            margin-bottom: 35px;\n            animation: fadeIn 0.6s ease-out;\n        }\n        \n        @keyframes fadeIn {\n            from { opacity: 0; transform: translateY(20px); }\n            to { opacity: 1; transform: translateY(0); }\n        }\n        \n        .section-title {\n            font-size: 22px;\n            color: #2c3e50;\n            margin-bottom: 20px;\n            padding-bottom: 10px;\n            border-bottom: 3px solid #3498db;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        \n        .section-content {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #3498db;\n            line-height: 1.8;\n            font-size: 16px;\n            color: #2c3e50;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .section-content::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 3s infinite;\n        }\n        \n        @keyframes shine {\n            0% { left: -100%; }\n            100% { left: 100%; }\n        }\n        \n        .citas-section {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            color: #2c3e50;\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #9b59b6;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .citas-section::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 4s infinite;\n        }\n        \n        .citas-section p {\n            color: #2c3e50 !important;\n            margin: 12px 0;\n            font-size: 16px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .citas-section p::before {\n            content: '💬';\n            position: absolute;\n            left: -20px;\n            color: #9b59b6;\n        }\n        \n        .conclusion-section {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            color: #2c3e50;\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #e74c3c;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .conclusion-section::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 5s infinite;\n        }\n        \n        .conclusion-section .section-content {\n            background: transparent;\n            border: none;\n            padding: 0;\n            color: #2c3e50;\n            font-size: 16px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .footer {\n            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);\n            color: white;\n            padding: 25px;\n            text-align: center;\n            font-size: 14px;\n        }\n        \n        .icon {\n            font-size: 24px;\n            margin-right: 8px;\n        }\n        \n        @media (max-width: 600px) {\n            .container {\n                margin: 10px;\n                border-radius: 15px;\n            }\n            \n            .header, .content {\n                padding: 20px;\n            }\n            \n            .header h1 {\n                font-size: 24px;\n            }\n            \n            .section-title {\n                font-size: 20px;\n            }\n            \n            .logo img {\n                max-width: 100px;\n                max-height: 70px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <div class=\"logo\">\n                <img src=\"https://drive.google.com/uc?id=1r2eXR7N8-MyJ0jyqGwosqjI_hXo6OABZ\" alt=\"Logo Tutor.IA\" onerror=\"this.style.display='none'\">\n            </div>\n            <h1>📋 Detalles de la Sesion</h1>\n            <div class=\"date\">📅 ${title}</div>\n        </div>\n        \n        <div class=\"content\">\n            ${resumen ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">📚</span>\n                        Resumen de la clase\n                    </h2>\n                    <div class=\"section-content\">\n                        ${formatMarkdown(resumen)}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${observacion ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">🔎</span>\n                        Observación sobre la presencia del docente\n                    </h2>\n                    <div class=\"section-content\">\n                        ${formatMarkdown(observacion)}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${citas ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">💬</span>\n                        Citas destacadas\n                    </h2>\n                    <div class=\"citas-section\">\n                        ${citasFormateadas}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${conclusion ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">🌟</span>\n                        Sugerencias para la mejora docente\n                    </h2>\n                    <div class=\"conclusion-section\">\n                        <div class=\"section-content\">\n                            ${conclusionFormateada}\n                        </div>\n                    </div>\n                </div>\n            ` : \"\"}\n        </div>\n        \n        <div class=\"footer\">\n            <p>© 2025 Tutor.IA - Acta generada automáticamente</p>\n        </div>\n    </div>\n</body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;"
       },
-      "id": "06eda6f2-9a20-4b0c-8d2f-d07e69578dde",
+      "id": "7b9322d0-b6f4-4a1c-9802-7f9f275d2768",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        -640,
-        -240
+        1580,
+        0
       ],
       "typeVersion": 2
     },
@@ -175,19 +175,19 @@
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "006ce1e4-d0a2-49c7-a3de-454c86500687",
+      "id": "b3dd6ff8-a99f-4d54-9ff7-9e371a5ada47",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        -460,
-        -240
+        1760,
+        0
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "WHrFKdYAukBTJHKs",
-          "name": "SMTP tutor.ia@uai.edu.pe"
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
         }
       }
     },
@@ -199,18 +199,18 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "de3259ab-9f22-4c1d-9171-0eec07e520be",
+      "id": "b409bfd7-8760-41a8-afa4-eac9c853c15b",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -2420,
-        -220
+        -200,
+        20
       ],
       "typeVersion": 4.2,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       },
       "onError": "continueErrorOutput"
@@ -221,12 +221,12 @@
         "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
         "options": {}
       },
-      "id": "a577ba19-2a6f-45d1-9676-7bd0cb035b9a",
+      "id": "56088edc-d13c-48d6-a362-e8ed3d4ac73e",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
-        -1340,
-        -240
+        880,
+        0
       ],
       "typeVersion": 1.9
     },
@@ -239,10 +239,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3180,
-        -220
+        -960,
+        20
       ],
-      "id": "8a5de542-78e8-4aab-aa01-e15fbf1c3c25",
+      "id": "01a9b9fb-6ee4-4ebc-9980-4328a86ccd22",
       "name": "recording-completed",
       "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
     },
@@ -253,12 +253,12 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "0be3562a-4375-4312-a13d-bfd59e671ab6",
+      "id": "7c6bfea4-02b1-46e3-ad53-e0644fb28470",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -2800,
-        -220
+        -580,
+        20
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -266,8 +266,8 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -283,14 +283,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        -1360,
-        -20
+        860,
+        220
       ],
-      "id": "df946b34-8e2f-42ec-a814-5b919fad8643",
+      "id": "4eda06bf-e8b4-47b6-952b-71aced5b27ea",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "sfJcS7f5MZWQ5awr",
+          "id": "QmTgzEmdTeYzjlTn",
           "name": "OpenAi account"
         }
       }
@@ -303,10 +303,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2980,
-        -220
+        -760,
+        20
       ],
-      "id": "c34d6808-cce2-47aa-8e1d-39ed91cb33c6",
+      "id": "695f08cb-cdfc-42b2-b5c0-8d7c680a8997",
       "name": "basic-info-depuration-I"
     },
     {
@@ -317,10 +317,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2620,
-        -220
+        -400,
+        20
       ],
-      "id": "c44ae23b-fcd9-4a42-8855-9465a91099e8",
+      "id": "feebe3d4-9248-4688-a323-dc619df2ce21",
       "name": "basic-info-depuration-II"
     },
     {
@@ -332,10 +332,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3200,
-        320
+        -980,
+        560
       ],
-      "id": "98316a70-67ab-42a5-948e-baedcd28c73d",
+      "id": "96dceda4-15fa-4c94-9f00-891ba673c20a",
       "name": "meeting-started",
       "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
     },
@@ -371,12 +371,12 @@
         },
         "options": {}
       },
-      "id": "917c3151-04e1-498c-936c-74b9c0f0f5d0",
+      "id": "89e22874-aebf-4246-bd0d-24cc11bb5a0c",
       "name": "Sort for mail",
       "type": "n8n-nodes-base.set",
       "position": [
-        -2400,
-        320
+        -180,
+        560
       ],
       "typeVersion": 3.4
     },
@@ -388,19 +388,19 @@
         "html": "={{ $json.body }}",
         "options": {}
       },
-      "id": "87bbcfb9-454b-4cc8-afe9-b530a7c7856b",
+      "id": "893e5399-7493-446e-925d-b6fba91bf907",
       "name": "Send url for students",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        -2200,
-        320
+        20,
+        560
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "WHrFKdYAukBTJHKs",
-          "name": "SMTP tutor.ia@uai.edu.pe"
+          "id": "Buf55T4UiocNcnwR",
+          "name": "dante.luque@uai.edu.pe"
         }
       }
     },
@@ -411,12 +411,12 @@
         "meetingId": "={{ $json.body.payload.object.id }}",
         "additionalFields": {}
       },
-      "id": "19158866-7533-4dea-a659-1822acef19dc",
+      "id": "fb0501a8-acfd-4ecb-90fe-5d4fd2f6e013",
       "name": "Zoom: Get-data-by-meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -3020,
-        320
+        -800,
+        560
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -424,8 +424,8 @@
       "retryOnFail": false,
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -437,10 +437,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2820,
-        320
+        -600,
+        560
       ],
-      "id": "69cf544f-72be-4c20-8886-f77df17ed858",
+      "id": "e79c78f0-e41b-445f-b8ad-4af8907443fc",
       "name": "meeting-info"
     },
     {
@@ -452,10 +452,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3200,
-        520
+        -980,
+        780
       ],
-      "id": "df4ed61e-a691-4aa6-88fc-2e57d0ed1942",
+      "id": "8eb9c612-250a-4479-89dc-0fa726e0374d",
       "name": "participants-joined",
       "webhookId": "285cc8ab-496b-4780-9f5a-46c9ef5dd1bd"
     },
@@ -465,16 +465,16 @@
         "url": "https://known-moth-included.ngrok-free.app/ms/v1/meeting/save",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"status\": \"{{ $json.meeting.status }}\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\",\n    }\n  }\n}",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"status\": \"{{ $json.meeting.status }}\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\"\n    }\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2760,
-        140
+        -540,
+        380
       ],
-      "id": "a0577e52-5c53-44a3-bf2a-63adf85efd80",
+      "id": "5ca83e07-7ad0-409f-aaf1-f9abba9e6fb0",
       "name": "/ms/v1/meeting/save"
     },
     {
@@ -485,10 +485,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2960,
-        520
+        -780,
+        780
       ],
-      "id": "538d2fd0-7cd9-4811-8642-42f9ffcbae85",
+      "id": "b93429ef-1e8a-4e99-ad7b-284bdddcf6e8",
       "name": "participant-info"
     },
     {
@@ -503,10 +503,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2760,
-        520
+        -560,
+        780
       ],
-      "id": "d453e00f-699e-4eb8-bda2-29a8ddcc5e08",
+      "id": "0573ec3e-9e56-4014-ad58-ccb72b0cbc81",
       "name": "/ms/v1/participant/save"
     },
     {
@@ -519,15 +519,15 @@
       "type": "n8n-nodes-base.zoom",
       "typeVersion": 1,
       "position": [
-        -3000,
-        720
+        -780,
+        1000
       ],
-      "id": "55d03252-3bd3-481a-8776-25c972ac9538",
+      "id": "b00a2165-2eae-44c8-be46-b0a9b1ef02cc",
       "name": "Get many meetings",
       "credentials": {
         "zoomOAuth2Api": {
-          "id": "GvkMMGjMdcsNDBlN",
-          "name": "zoom-bot-UAI"
+          "id": "OWxxxr25OQpDiUJj",
+          "name": "zoom-bot-uai"
         }
       }
     },
@@ -538,10 +538,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2780,
-        720
+        -560,
+        1000
       ],
-      "id": "d36403af-5ba6-413f-bf96-a1678255cb86",
+      "id": "8f4187b2-cce5-490f-9e27-3fabc8311d09",
       "name": "add status field"
     },
     {
@@ -553,10 +553,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3200,
-        720
+        -980,
+        1000
       ],
-      "id": "aeff65c4-4465-46a5-b239-452a9761efb3",
+      "id": "cd20ee39-51dc-4d17-a205-104df2ab8a09",
       "name": "api/reuniones",
       "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
     },
@@ -570,10 +570,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -2560,
-        720
+        -340,
+        1000
       ],
-      "id": "0454975a-f25e-4c0a-ae08-6aae6f921440",
+      "id": "2750fe34-835f-4e00-87cf-e23bc84b64f3",
       "name": "endpoint"
     },
     {
@@ -583,10 +583,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2620,
-        320
+        -400,
+        560
       ],
-      "id": "dced28b1-6655-41c6-8549-719fa5eb9448",
+      "id": "4ebcad20-1a94-4aeb-909f-031b9fbeea59",
       "name": "encuesta - link"
     },
     {
@@ -615,12 +615,12 @@
         },
         "options": {}
       },
-      "id": "4c4d7bf4-f874-4c6f-9384-f49876f8d9a7",
+      "id": "628e2575-a9ef-405e-a9c8-a25d30ffc96e",
       "name": "TEST - Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        -920,
-        -20
+        1300,
+        220
       ],
       "typeVersion": 3.4
     },
@@ -633,10 +633,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -3200,
-        140
+        -980,
+        380
       ],
-      "id": "0f2bf8bd-7c5b-4b6f-adbe-845ad963438c",
+      "id": "8baa07db-413d-4e0e-813e-abe173081423",
       "name": "meeting-created",
       "webhookId": "e16d2b77-53a2-4c2b-a1b0-c184e1118753"
     },
@@ -648,10 +648,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2960,
-        140
+        -740,
+        380
       ],
-      "id": "0ca75614-da2a-486f-80e4-9137d5fac716",
+      "id": "e09b1a49-f60a-421b-a715-5011e46360ba",
       "name": "meeting-info1"
     }
   ],
@@ -699,11 +699,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Sort for mail delivery": {
-      "main": [
-        []
       ]
     },
     "Zoom: Get transcript file": {
@@ -956,15 +951,15 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "47b1b1b5-392e-4b4c-8180-450d422bafd0",
+  "versionId": "c29a021b-7e71-4b8e-9b35-f5afe404eedf",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
+    "instanceId": "454729db38a816ba17672547d891b9ee997c0a89a7f27101f45250cd2fd3ecb5"
   },
-  "id": "iKVmVGRXVvXSPtxf",
+  "id": "vGgERuNGEMm1tfpd",
   "tags": []
 }
