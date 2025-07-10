@@ -519,8 +519,8 @@
       "type": "n8n-nodes-base.zoom",
       "typeVersion": 1,
       "position": [
-        -800,
-        660
+        920,
+        980
       ],
       "id": "4fce3783-4f7d-48fb-95cc-cd13766dc297",
       "name": "Get many meetings",
@@ -538,8 +538,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -580,
-        660
+        1140,
+        980
       ],
       "id": "6f55cee4-2bdd-4b89-97f2-50726eef417e",
       "name": "add status field"
@@ -553,12 +553,13 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1000,
-        660
+        720,
+        980
       ],
       "id": "0e658ff2-29a3-4b92-8a75-f9d61b0dc657",
       "name": "api/reuniones",
-      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3"
+      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3",
+      "disabled": true
     },
     {
       "parameters": {
@@ -570,15 +571,15 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        -360,
-        660
+        1360,
+        980
       ],
       "id": "df02834a-99bc-42b0-b6d7-b561b4d6c34b",
       "name": "endpoint"
     },
     {
       "parameters": {
-        "jsCode": "const uriBase = \"https://encuesta-l2blq.web.app\"\nconst idMeeting = $input.first().json.meeting.id\nconst idHost = $input.first().json.meeting.host.id\n\nreturn {\n  formLink: `${uriBase}/${idMeeting}/${idHost}`\n}"
+        "jsCode": "const uriBase = \"https://encuesta-e0vth.web.app\"\nconst idMeeting = $input.first().json.meeting.id\nconst idHost = $input.first().json.meeting.host.id\n\nreturn {\n  formLink: `${uriBase}/${idMeeting}/${idHost}`\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -715,8 +716,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -760,
-        320
+        -780,
+        300
       ],
       "id": "0d762604-beb8-4dbe-95e9-7de8f3ff2101",
       "name": "/ms/v1/meeting/status/:meeting_id - finished"
@@ -730,12 +731,27 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -980,
-        320
+        -1000,
+        300
       ],
       "id": "2d9084d8-dd3c-4e8b-a49b-09c84b8634fa",
       "name": "meeting-end",
       "webhookId": "ba9b3d14-789c-4b6e-bcbc-0cccdc7b1b51"
+    },
+    {
+      "parameters": {
+        "content": "## CASI OBSOLETO\n",
+        "height": 260,
+        "width": 920
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        920
+      ],
+      "id": "0d5a8e52-9043-4653-b7a1-930a89c208b8",
+      "name": "Sticky Note"
     }
   ],
   "pinData": {},
@@ -1071,11 +1087,11 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "920a04a7-1fc0-42e2-8a75-18469774f949",
+  "versionId": "3c5f0e01-ee16-4428-8724-a32d80d24d37",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
