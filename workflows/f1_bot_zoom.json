@@ -5,12 +5,12 @@
       "parameters": {
         "errorMessage": "={{ $json.error.cause.message }}"
       },
-      "id": "2b5d80a4-7d2b-4bb5-a773-5ffaca2190bc",
+      "id": "9774e8ba-a253-483c-9418-d426235e2ea7",
       "name": "No Recording/Transcript available",
       "type": "n8n-nodes-base.stopAndError",
       "position": [
-        -360,
-        520
+        -20,
+        180
       ],
       "typeVersion": 1
     },
@@ -22,34 +22,21 @@
               "id": "ef149af8-7f9d-4e5a-8ccf-4a5f1e09eecc",
               "name": "transcript_file",
               "type": "string",
-              "value": "={{ $json.recording_files.find(f => f.file_type === 'TRANSCRIPT').download_url }}"
+              "value": "={{ $json.recording_files.find(f => f.file_type === 'CC' && f.file_extension === 'VTT')?.download_url }}"
             }
           ]
         },
         "options": {}
       },
-      "id": "66da0210-6066-457f-bcc3-1af98e9859ca",
+      "id": "733d944f-fb3b-4218-ac98-48f75c7bc55c",
       "name": "Filter transcript URL",
       "type": "n8n-nodes-base.set",
       "position": [
-        -360,
-        160
+        -20,
+        0
       ],
       "typeVersion": 3.4,
       "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "id": "f3ad0404-4b14-4398-a1cb-2aa272573c06",
-      "name": "Filter: Only 1 item",
-      "type": "n8n-nodes-base.splitInBatches",
-      "position": [
-        -180,
-        200
-      ],
-      "typeVersion": 3
     },
     {
       "parameters": {
@@ -58,11 +45,11 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "39f1feab-12f2-47ab-96a6-4bb56ebc6417",
+      "id": "4c1d9372-2c37-44cb-b8fa-4f40a5b2ebd2",
       "name": "Zoom: Get transcript file",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        0,
+        160,
         0
       ],
       "typeVersion": 4.2,
@@ -78,12 +65,12 @@
         "operation": "text",
         "options": {}
       },
-      "id": "593331c7-f4a4-4900-9ab1-4ce4f2d5e3ab",
+      "id": "7171bd99-584b-492e-b827-b29366d07f74",
       "name": "Extract text from transcript file",
       "type": "n8n-nodes-base.extractFromFile",
       "position": [
-        180,
-        160
+        340,
+        0
       ],
       "typeVersion": 1
     },
@@ -101,28 +88,28 @@
         },
         "options": {}
       },
-      "id": "8b0bccb8-cb57-43ab-87dd-4a5d5ca9f2bc",
+      "id": "2861c0dd-37b4-441c-80f0-1936d05749e3",
       "name": "Format transcript text",
       "type": "n8n-nodes-base.set",
       "position": [
-        360,
-        160
+        500,
+        0
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info').item.json.meetingId }}/participants",
+        "url": "=https://api.zoom.us/v2/past_meetings/{{ $('basic-info-depuration-I').item.json.meetingId }}/participants",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "6086aff8-ebaf-4ea9-a5eb-b66d3ec46b72",
+      "id": "4f6d7099-0db4-4a60-a953-c6e30bbb3277",
       "name": "Zoom: Get participants data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        560,
-        160
+        680,
+        0
       ],
       "typeVersion": 4.2,
       "credentials": {
@@ -140,13 +127,13 @@
               "id": "cc51b7e4-d5c2-4cd4-9488-4d181eaaa02e",
               "name": "subject",
               "type": "string",
-              "value": "=Meeting summary: {{ $('Zoom: Get data by meetingId').item.json.topic }} on {{ DateTime.fromISO($('Zoom: Get data by meetingId').item.json.start_time).toFormat('yyyy-MM-dd HH:mm') }}"
+              "value": "=📢 Resumen de la Clase: \"{{ $('Zoom: Get data by meetingId').item.json.topic }}\" - {{ DateTime.fromISO($('Zoom: Get data by meetingId').item.json.start_time).toFormat('yyyy-MM-dd HH:mm') }}"
             },
             {
               "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
               "name": "=to",
               "type": "string",
-              "value": "={{ $('Zoom: Get participants data').item.json.participants[0].user_email }}"
+              "value": "=hola@uai.edu.pe, mariana.campos@autonomadeica.edu.pe, dany.mejia@autonomadeica.edu.pe, humberto.quispe@autonomadeica.edu.pe, yassir.bonifacio@autonomadeica.edu.pe, susana.atuncar@autonomadeica.edu.pe, angemar@autonomadeica.edu.pe, karina.garcia@autonomadeica.edu.pe"
             },
             {
               "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
@@ -158,49 +145,49 @@
         },
         "options": {}
       },
-      "id": "e6e4da6f-587c-4b61-a109-045f43fcc0a5",
+      "id": "f7403416-13c6-40dd-84e9-877f77c607e0",
       "name": "Sort for mail delivery",
       "type": "n8n-nodes-base.set",
       "position": [
-        1000,
-        160
+        1280,
+        20
       ],
       "typeVersion": 3.4
     },
     {
       "parameters": {
-        "jsCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n\n  const getSection = (title) => {\n    const regex = new RegExp(\n      `\\\\*\\\\*${title}:\\\\*\\\\*[\\\\s\\\\S]*?(?=\\\\*\\\\*|$)`,\n      \"i\",\n    );\n    const match = body.match(regex);\n    return match\n      ? match[0].replace(new RegExp(`\\\\*\\\\*${title}:\\\\*\\\\*`, \"i\"), \"\").trim()\n      : \"\";\n  };\n\n  const titleMatch = body.match(/\\*\\*Fecha:\\*\\*\\s*(.*?)\\n/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n\n  const participantes = getSection(\"Participantes\");\n  const resumen = getSection(\"Resumen general de la reunión\");\n  const citas = getSection(\"Intervenciones destacadas o citas relevantes\");\n\n  const html = `<html>\n  <body style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 20px;\">\n    <h1 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Acta de Reunión - ${title}</h1>\n\n    ${\n      participantes\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Participantes:</h2>\n    <ul style=\"list-style-type: none; padding-left: 20px;\">\n    ${participantes\n      .split(\"\\n\")\n      .map((p) => `<li>${p.replace(\"- \", \"\")}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n    ${\n      resumen\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Resumen de la reunión:</h2>\n    <p style=\"margin-left: 20px;\">${resumen}</p>`\n        : \"\"\n    }\n\n    ${\n      citas\n        ? `\n    <h2 style=\"color: #2c3e50; margin-top: 20px;\">Citas destacadas:</h2>\n    <ul style=\"margin-left: 20px;\">\n    ${citas\n      .split(\"\\n\")\n      .map((p) => `<li>${p.trim()}</li>`)\n      .join(\"\\n\")}\n    </ul>`\n        : \"\"\n    }\n\n  </body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;\n"
+        "jsCode": "const items = [];\nfor (const item of $input.all()) {\n  const body = item.json.body;\n  if (!body) continue;\n  \n  const formatMarkdown = (text) => {\n    return text\n      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Negrita\n      .replace(/\\n/g, '<br>'); // Saltos de línea\n  };\n  \n  const getSection = (sectionTitle) => {\n    const regex = new RegExp(`###\\\\s*${sectionTitle}\\\\s*\\\\n([\\\\s\\\\S]*?)(?=\\\\n###|\\\\n---|$)`, 'i');\n    const match = body.match(regex);\n    return match ? match[1].trim() : '';\n  };\n  \n  const titleMatch = body.match(/\\*\\*📅 Fecha:\\*\\*\\s*(.*?)\\s\\s/);\n  const title = titleMatch ? titleMatch[1].trim() : \"Acta de Reunión\";\n  \n  const resumen = getSection(\"📚 Resumen general de la clase\");\n  const observacion = getSection(\"🔎 Observación sobre la presencia y participación del docente\");\n  const citas = getSection(\"💬 Intervenciones destacadas o citas relevantes\");\n  const conclusion = getSection(\"🌟 Sugerencias para la mejora docente\");\n  \n  const citasFormateadas = citas\n    .split(\"\\n\")\n    .filter(line => line.trim() !== \"\")\n    .map(line => `<p style=\"margin: 8px 0; color: #2c3e50; font-style: italic; position: relative; padding-left: 20px;\">\"${line.trim()}\"</p>`)\n    .join(\"\\n\");\n  \n  const conclusionFormateada = formatMarkdown(\n    conclusion.replace(/^> /gm, '').trim()\n  );\n  \n  const html = `\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Acta de Reunión - ${title}</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        \n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            min-height: 100vh;\n            padding: 20px;\n            color: #333;\n        }\n        \n        .container {\n            max-width: 800px;\n            margin: 0 auto;\n            background: white;\n            border-radius: 20px;\n            box-shadow: 0 20px 40px rgba(0,0,0,0.1);\n            overflow: hidden;\n            animation: slideIn 0.8s ease-out;\n        }\n        \n        @keyframes slideIn {\n            from { opacity: 0; transform: translateY(30px); }\n            to { opacity: 1; transform: translateY(0); }\n        }\n        \n        .header {\n            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);\n            padding: 30px;\n            text-align: center;\n            color: white;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .header::before {\n            content: '';\n            position: absolute;\n            top: -50%;\n            left: -50%;\n            width: 200%;\n            height: 200%;\n            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);\n            background-size: 20px 20px;\n            animation: float 20s linear infinite;\n        }\n        \n        @keyframes float {\n            0% { transform: rotate(0deg) translateX(0px); }\n            100% { transform: rotate(360deg) translateX(10px); }\n        }\n        \n        .logo {\n            position: relative;\n            z-index: 2;\n            margin-bottom: 20px;\n        }\n        \n        .logo img {\n            width: 80px;\n            height: 80px;\n            width: auto;\n            height: auto;\n            border-radius: 10px;\n            box-shadow: 0 4px 15px rgba(0,0,0,0.2);\n            background: white;\n            padding: 5px;\n            animation: logoGlow 2s ease-in-out infinite alternate;\n        }\n        \n        @keyframes logoGlow {\n            from { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }\n            to { box-shadow: 0 4px 20px rgba(255,255,255,0.3); }\n        }\n        \n        .header h1 {\n            font-size: 28px;\n            margin-bottom: 10px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .header .date {\n            font-size: 18px;\n            opacity: 0.9;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .content {\n            padding: 40px;\n        }\n        \n        .section {\n            margin-bottom: 35px;\n            animation: fadeIn 0.6s ease-out;\n        }\n        \n        @keyframes fadeIn {\n            from { opacity: 0; transform: translateY(20px); }\n            to { opacity: 1; transform: translateY(0); }\n        }\n        \n        .section-title {\n            font-size: 22px;\n            color: #2c3e50;\n            margin-bottom: 20px;\n            padding-bottom: 10px;\n            border-bottom: 3px solid #3498db;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        \n        .section-content {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #3498db;\n            line-height: 1.8;\n            font-size: 16px;\n            color: #2c3e50;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .section-content::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 3s infinite;\n        }\n        \n        @keyframes shine {\n            0% { left: -100%; }\n            100% { left: 100%; }\n        }\n        \n        .citas-section {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            color: #2c3e50;\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #9b59b6;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .citas-section::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 4s infinite;\n        }\n        \n        .citas-section p {\n            color: #2c3e50 !important;\n            margin: 12px 0;\n            font-size: 16px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .citas-section p::before {\n            content: '💬';\n            position: absolute;\n            left: -20px;\n            color: #9b59b6;\n        }\n        \n        .conclusion-section {\n            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);\n            color: #2c3e50;\n            padding: 25px;\n            border-radius: 15px;\n            border-left: 5px solid #e74c3c;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .conclusion-section::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);\n            animation: shine 5s infinite;\n        }\n        \n        .conclusion-section .section-content {\n            background: transparent;\n            border: none;\n            padding: 0;\n            color: #2c3e50;\n            font-size: 16px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .footer {\n            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);\n            color: white;\n            padding: 25px;\n            text-align: center;\n            font-size: 14px;\n        }\n        \n        .icon {\n            font-size: 24px;\n            margin-right: 8px;\n        }\n        \n        @media (max-width: 600px) {\n            .container {\n                margin: 10px;\n                border-radius: 15px;\n            }\n            \n            .header, .content {\n                padding: 20px;\n            }\n            \n            .header h1 {\n                font-size: 24px;\n            }\n            \n            .section-title {\n                font-size: 20px;\n            }\n            \n            .logo img {\n                max-width: 100px;\n                max-height: 70px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <div class=\"logo\">\n                <img src=\"https://drive.google.com/uc?id=1r2eXR7N8-MyJ0jyqGwosqjI_hXo6OABZ\" alt=\"Logo Tutor.IA\" onerror=\"this.style.display='none'\">\n            </div>\n            <h1>📋 Detalles de la Sesion</h1>\n            <div class=\"date\">📅 ${title}</div>\n        </div>\n        \n        <div class=\"content\">\n            ${resumen ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">📚</span>\n                        Resumen de la clase\n                    </h2>\n                    <div class=\"section-content\">\n                        ${formatMarkdown(resumen)}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${observacion ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">🔎</span>\n                        Observación sobre la presencia del docente\n                    </h2>\n                    <div class=\"section-content\">\n                        ${formatMarkdown(observacion)}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${citas ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">💬</span>\n                        Citas destacadas\n                    </h2>\n                    <div class=\"citas-section\">\n                        ${citasFormateadas}\n                    </div>\n                </div>\n            ` : \"\"}\n            \n            ${conclusion ? `\n                <div class=\"section\">\n                    <h2 class=\"section-title\">\n                        <span class=\"icon\">🌟</span>\n                        Sugerencias para la mejora docente\n                    </h2>\n                    <div class=\"conclusion-section\">\n                        <div class=\"section-content\">\n                            ${conclusionFormateada}\n                        </div>\n                    </div>\n                </div>\n            ` : \"\"}\n        </div>\n        \n        <div class=\"footer\">\n            <p>© 2025 Tutor.IA - Acta generada automáticamente</p>\n        </div>\n    </div>\n</body>\n</html>`;\n\n  items.push({\n    json: {\n      html,\n      to: item.json.to,\n      subject: item.json.subject,\n    },\n  });\n}\n\nreturn items;"
       },
-      "id": "14b62c6d-0746-4f54-90e2-65f6444c9d9b",
+      "id": "b2461809-3b0d-4bad-b030-e01c6110f600",
       "name": "Format to html",
       "type": "n8n-nodes-base.code",
       "position": [
-        1160,
-        160
+        1560,
+        0
       ],
       "typeVersion": 2
     },
     {
       "parameters": {
-        "fromEmail": "dante.luque@uai.edu.pe",
+        "fromEmail": "tutor.ia@uai.edu.pe",
         "toEmail": "={{ $json.to }}",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {}
       },
-      "id": "77f2954d-93db-4b2b-ac5d-d99f26b82fc1",
+      "id": "86c03aa4-b797-469a-8c7a-56504c0cf0ff",
       "name": "Send meeting summary",
       "type": "n8n-nodes-base.emailSend",
       "position": [
-        1320,
-        160
+        1760,
+        0
       ],
       "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
       "typeVersion": 2.1,
       "credentials": {
         "smtp": {
-          "id": "0Wmnl8T7UfTjqSNn",
-          "name": "SMTP dante.luque.edu.pe"
+          "id": "WHrFKdYAukBTJHKs",
+          "name": "SMTP tutor.ia@uai.edu.pe"
         }
       }
     },
@@ -212,12 +199,12 @@
         "nodeCredentialType": "zoomOAuth2Api",
         "options": {}
       },
-      "id": "d082df5f-2e27-4c56-a5fb-b7fb2e547808",
+      "id": "079c3aa5-cb81-4172-8ab1-f23dd76c2ef5",
       "name": "Zoom: Get transcripts data",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        -620,
-        380
+        -220,
+        20
       ],
       "typeVersion": 4.2,
       "credentials": {
@@ -231,37 +218,17 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Redacta un acta formal de reunión en español utilizando los siguientes datos del transcript y los detalles de la reunión.\n\nFecha de la reunión: {{ $('Zoom: Get data by meetingId').item.json.start_time }}\n\nParticipantes:\n{{ $json.participants.map(p => p.name + ' (' + p.user_email + ')').join(', ') }}\n\nTranscript de la reunión:\n{{ $('Format transcript text').item.json.transcript }}\n\nPor favor, estructura el acta con los siguientes apartados:\n\n---\n\n**Acta de Reunión**\n\n**Fecha:** [Fecha en formato DD/MM/AAAA]  \n**Hora de inicio y fin (si está disponible):**  \n**Participantes:** [Nombres con sus respectivos correos]  \n**Resumen general de la reunión:**  \n[Redactar en un párrafo claro y profesional los temas tratados, decisiones tomadas, acuerdos importantes y cualquier punto pendiente.]  \n**Intervenciones destacadas o citas relevantes:**  \n[Listar frases o puntos clave mencionados por los participantes, si aplica.]  \n\n---\n\nEl estilo debe ser formal, claro y redactado en **español neutro profesional**. No inventes información si no está presente en el transcript.\n",
+        "text": "=Actúa como un supervisor académico que evalúa de forma objetiva, clara y constructiva la calidad de una clase grabada en Zoom. Tu tarea es redactar un acta formal que resuma el desarrollo de la sesión, identifique puntos de mejora realistas y valore las oportunidades de crecimiento docente. Mantén un tono profesional, imparcial y empático: no sanciones, orienta.\n\nUtiliza los siguientes datos:\n\n- **Fecha programada de la clase:** {{ $('basic-info-depuration-II').item.json.startTimeLocal }}  \n- **Hora en la que el host inició la reunión:** {{ $('basic-info-depuration-I').item.json.startTimeLocal }}  \n- **Docente (host):** {{ $('Zoom: Get transcripts data').item.json.host_email }}\n\n---\n\n**Transcript crudo con tiempo** (útil para análisis de presencia y participación):  \n{{ $('Extract text from transcript file').item.json.data }}\n\n**Transcript limpio** (útil para redacción del acta):  \n{{ $('Format transcript text').item.json.transcript }}\n\n---\n\nRedacta el acta con la siguiente estructura:\n\n---\n\n### 📝 Acta de Reunión\n\n**📅 Fecha:** [En formato DD/MM/AAAA]  \n**🕐 Hora programada:** [Hora programada de la clase]  \n**🕐 Hora real de inicio del host:** [Hora registrada de inicio de la reunión]  \n\n---\n\n### 📚 Resumen general de la clase  \nRedacta un párrafo **breve** que describa el enfoque temático (si lo hay), nivel de preparación, claridad de objetivos, estructura y participación. Menciona aspectos positivos o destacables, pero también debilidades o áreas de mejora, usando **negrita** para resaltar hallazgos clave. Mantén un tono constructivo y profesional.\n\n---\n\n### 🔎 Observación sobre la presencia y participación del docente  \n1. Especifica si el docente inició la reunión antes, a tiempo o después de la hora programada.  \n2. Indica el **momento exacto en el transcript** (en segundos o formato `00:MM:SS`) en el que el docente habló por primera vez.  \n3. Evalúa si hubo **dilatación excesiva entre intervenciones** (por ejemplo, si hay más de 20 minutos sin participación del docente). Si ocurre, destácalo como una señal de posible desconexión o falta de conducción activa.  \n4. Usa un tono objetivo y orientado a la mejora profesional.\n\n---\n\n### 💬 Intervenciones destacadas o citas relevantes  \nSelecciona máximo 6 líneas directamente copiadas textualmente del transcript crudo con timestamp incluido, sin reformular ni parafrasear.  \nCada línea debe mantenerse **idéntica** a como aparece en la transcripción, incluyendo comillas, puntuación, pausas u onomatopeyas.  \nPresenta cada cita como un ítem de lista con viñeta tipo guion (`-`), en este formato:\n\n- \"Texto exacto de la intervención.\" (`00:00:00`)\n\n❗ No agregues introducciones, no resumas ni cambies la redacción. Mantén el estilo literal.\n\n---\n\n### 🌟 Sugerencias para la mejora docente  \nBrinda **solo 2 recomendaciones** puntuales para mejorar el desempeño docente, usando emojis y tono motivador.  \nEjemplos:\n\n- 📌 Establecer un objetivo claro y compartido al inicio  \n- 🧑‍🏫 Asegurar una presencia activa y constante durante la clase  \n- 🧰 Incorporar ejemplos o recursos visuales que refuercen el contenido  \n- 🎯 Guiar la participación de los estudiantes con preguntas relevantes  \n- 🗂️ Estructurar la sesión en secciones claras: introducción, desarrollo y cierre  \n- ⏱️ Controlar mejor el tiempo para mantener el ritmo y cubrir todos los puntos clave\n\nFinaliza con un mensaje positivo:\n\n> ✨ Cada clase ofrece una oportunidad para mejorar. Con pequeños ajustes en la preparación y conducción, esta experiencia puede transformarse en una sesión significativa para los estudiantes. ¡Adelante!\n\n---\n\n### ✅ Instrucciones finales  \n- Sé profesional, preciso y respetuoso.  \n- Usa **negrita** para resaltar los hallazgos clave.  \n- No inventes datos si no están disponibles.  \n- Evita repetir ideas y mantén el informe claro y enfocado.\n",
         "options": {}
       },
-      "id": "b305c0a3-5acd-4756-a2ac-af9ea6aea6e8",
+      "id": "ad3987fd-42ae-4f2b-837d-7dbc2f36c72c",
       "name": "Create meeting summary",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [
-        680,
-        340
+        860,
+        0
       ],
       "typeVersion": 1.9
-    },
-    {
-      "parameters": {
-        "model": "qwen/qwq-32b:free",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [
-        600,
-        600
-      ],
-      "id": "112b6ac7-d715-41d5-bfd3-ee1d8c115254",
-      "name": "OpenRouter Chat Model",
-      "credentials": {
-        "openRouterApi": {
-          "id": "E6M0X8KXICCAroWG",
-          "name": "OpenRouter apikey"
-        }
-      }
     },
     {
       "parameters": {
@@ -272,10 +239,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1300,
-        580
+        -980,
+        20
       ],
-      "id": "e1bbb747-6f74-4538-a229-9b62ae9589b2",
+      "id": "4f38263b-231e-4def-84b4-c7ecf83b839e",
       "name": "recording-completed",
       "webhookId": "a1a5385b-23c9-4096-be0f-66f260665f2f"
     },
@@ -286,12 +253,12 @@
         "meetingId": "={{ $json.meetingId }}",
         "additionalFields": {}
       },
-      "id": "a6ac3b3b-ef1b-41ec-98e9-761081171e04",
+      "id": "d40664f1-eaa6-4057-bdfe-d8d596073e78",
       "name": "Zoom: Get data by meetingId",
       "type": "n8n-nodes-base.zoom",
       "position": [
-        -880,
-        500
+        -600,
+        20
       ],
       "typeVersion": 1,
       "alwaysOutputData": false,
@@ -300,23 +267,491 @@
       "credentials": {
         "zoomOAuth2Api": {
           "id": "GvkMMGjMdcsNDBlN",
-          "name": "Zoom account"
+          "name": "zoom-bot-UAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        220
+      ],
+      "id": "0d845e89-3f7b-4f4d-a479-95b601209810",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "sfJcS7f5MZWQ5awr",
+          "name": "OpenAi account"
         }
       }
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const { object } = $json.body.payload;\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTime: object.start_time,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};"
+        "jsCode": "const { object } = $json.body.payload;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meetingId: object.id,\n    topic: object.topic,\n    startTimeUTC: object.start_time,\n    startTimeLocal: startTimeLocal,\n    uuid: object.uuid,\n    hostId: object.host_id\n  }\n};\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1060,
-        640
+        -780,
+        20
       ],
-      "id": "0e251cf7-bea1-4716-b1ac-f6e1e55e7b63",
-      "name": "basic-info"
+      "id": "bde1b6d0-c87e-4c50-bb80-10c5bc7b4c7f",
+      "name": "basic-info-depuration-I"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = $json;\n\n// Convertir start_time de UTC a hora local (Perú)\nconst startTimeUTC = new Date(data.start_time);\nconst options = {\n  timeZone: 'America/Lima',\n  hour12: false,\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit',\n};\nconst startTimeLocal = startTimeUTC.toLocaleString('es-PE', options); // Resultado: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    uuid: data.uuid,\n    id: data.id,\n    hostId: data.host_id,\n    hostEmail: data.host_email,\n    assistantId: data.assistant_id,\n    topic: data.topic,\n    type: data.type,\n    status: data.status,\n    startTimeUTC: data.start_time,\n    startTimeLocal: startTimeLocal,\n    duration: data.duration,\n    timezone: data.timezone,\n    agenda: data.agenda,\n    createdAt: data.created_at,\n    startUrl: data.start_url,\n    joinUrl: data.join_url\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        20
+      ],
+      "id": "41b4e133-7387-43f9-8512-eb790b761d07",
+      "name": "basic-info-depuration-II"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-started",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        -580
+      ],
+      "id": "47e49a81-ccce-47b3-b053-4f906af79d6c",
+      "name": "meeting-started",
+      "webhookId": "4fee8b5a-8ff7-4686-a80d-82669b720f37"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc51b7e4-d5c2-4cd4-9488-4d181eaaa02e",
+              "name": "subject",
+              "type": "string",
+              "value": "=📄 Formulario de la clase: \"{{ $('meeting-info').item.json.meeting.topic }}\" - {{ $('meeting-info').item.json.meeting.startTime }}"
+            },
+            {
+              "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
+              "name": "=to",
+              "type": "string",
+              "value": "={{ $('meeting-info').item.json.meeting.host.email }}"
+            },
+            {
+              "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
+              "name": "body",
+              "type": "string",
+              "value": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Tutor.IA - Mensaje</title>\n  <style>\n      * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        \n        body {\n            font-family: 'Arial', sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            min-height: 100vh;\n            padding: 20px;\n        }\n        \n        .container {\n            max-width: 600px;\n            margin: 0 auto;\n            background: white;\n            border-radius: 20px;\n            box-shadow: 0 20px 40px rgba(0,0,0,0.1);\n            overflow: hidden;\n            animation: slideIn 0.8s ease-out;\n        }\n        \n        @keyframes slideIn {\n            from {\n                opacity: 0;\n                transform: translateY(30px);\n            }\n            to {\n                opacity: 1;\n                transform: translateY(0);\n            }\n        }\n        \n        .header {\n            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);\n            padding: 30px;\n            text-align: center;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .header::before {\n            content: '';\n            position: absolute;\n            top: -50%;\n            left: -50%;\n            width: 200%;\n            height: 200%;\n            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);\n            background-size: 20px 20px;\n            animation: float 20s linear infinite;\n        }\n        \n        @keyframes float {\n            0% { transform: rotate(0deg) translateX(0px); }\n            100% { transform: rotate(360deg) translateX(10px); }\n        }\n        \n        .logo {\n            width: 455px;\n            height: 120px;\n            margin: 0 auto 20px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            position: relative;\n            z-index: 1;\n            animation: pulse 2s infinite;\n            overflow: hidden;\n            border-radius: 15px;\n        }\n        \n        .logo img {\n            width: 100%;\n            height: 100%;\n            object-fit: cover;\n            border-radius: 15px;\n        }\n        \n        @keyframes pulse {\n            0%, 100% { transform: scale(1); }\n            50% { transform: scale(1.05); }\n        }\n        \n        .company-name {\n            color: white;\n            font-size: 28px;\n            font-weight: bold;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .content {\n            padding: 40px;\n        }\n        \n        .greeting {\n            font-size: 24px;\n            color: #2d3748;\n            margin-bottom: 30px;\n            font-weight: 600;\n        }\n        \n        .message {\n            font-size: 16px;\n            line-height: 1.8;\n            color: #4a5568;\n            margin-bottom: 30px;\n        }\n        \n        .link-section {\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            color: white;\n            padding: 25px;\n            border-radius: 15px;\n            margin: 30px 0;\n            text-align: center;\n            position: relative;\n            overflow: hidden;\n        }\n        \n        .link-section::before {\n            content: '';\n            position: absolute;\n            top: 0;\n            left: -100%;\n            width: 100%;\n            height: 100%;\n            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);\n            animation: shine 3s infinite;\n        }\n        \n        @keyframes shine {\n            0% { left: -100%; }\n            100% { left: 100%; }\n        }\n        \n        .link-section h3 {\n            margin-bottom: 15px;\n            position: relative;\n            z-index: 1;\n        }\n        \n        .link-section p {\n            position: relative;\n            z-index: 1;\n        }\n        \n        .link-section a {\n            color: #ffd700;\n            text-decoration: none;\n            font-weight: bold;\n            word-break: break-all;\n        }\n        \n        .link-section a:hover {\n            text-decoration: underline;\n        }\n        \n        .footer {\n            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);\n            color: white;\n            padding: 30px;\n            text-align: center;\n        }\n        \n        .contact-info {\n            font-size: 14px;\n            color: rgba(255,255,255,0.8);\n        }\n        \n        @media (max-width: 600px) {\n            .container {\n                margin: 10px;\n                border-radius: 15px;\n            }\n            \n            .header, .content, .footer {\n                padding: 20px;\n            }\n            \n            .logo {\n                width: 290px;\n                height: 100px;\n            }\n            \n            .company-name {\n                font-size: 24px;\n            }\n            \n            .greeting {\n                font-size: 20px;\n            }\n        }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <div class=\"logo\">\n        <img src=\"https://drive.google.com/uc?id=1l22pb0dFRDVHnOs4ijKMQZlXI8hy5peG\" alt=\"Tutor.IA Logo\">\n      </div>\n    </div>\n    <div class=\"content\">\n      <div class=\"greeting\">¡Hola, {{ $('meeting-info').item.json.meeting.host.email }}! 😄</div>\n      <div class=\"message\">Se le comparte el link para que sus alumnos le den feedback a su clase.</div>\n      <div class=\"link-section\">\n        <p><a href=\"{{ $json.formLink }}\" target=\"_blank\">{{ $json.formLink }}</a></p>\n      </div>\n    </div>\n    <div class=\"footer\">\n      <div class=\"contact-info\">\n        <small>© 2025 Tutor.IA. Todos los derechos reservados.</small>\n      </div>\n    </div>\n  </div>\n</body>"
+            },
+            {
+              "id": "de580983-c982-46c8-94c2-395580b1bee7",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d170faf4-3b11-4d05-92d3-003ab95d977d",
+      "name": "Sort for mail",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -200,
+        -580
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fromEmail": "tutor.ia@uai.edu.pe",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "9eeecca8-f22d-4909-aaf8-7d4ffcc740b2",
+      "name": "Send url for students",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        0,
+        -580
+      ],
+      "webhookId": "81c4f081-f3d1-44c3-a344-3f735f1873b5",
+      "typeVersion": 2.1,
+      "credentials": {
+        "smtp": {
+          "id": "WHrFKdYAukBTJHKs",
+          "name": "SMTP tutor.ia@uai.edu.pe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "meetingId": "={{ $json.body.payload.object.id }}",
+        "additionalFields": {}
+      },
+      "id": "73e7e906-9d57-4d0f-bd0d-f150c918ff9b",
+      "name": "Zoom: Get-data-by-meetingId",
+      "type": "n8n-nodes-base.zoom",
+      "position": [
+        -820,
+        -580
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const object = $json;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(object.start_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString(\"es-PE\", options); // ejemplo: \"27/06/2025, 10:30\"\n\nreturn {\n  json: {\n    meeting: {\n      id: object.id,\n      uuid: object.uuid,\n      topic: object.topic,\n      startTime: startTimeLocal,\n      status: object.status,\n      duration: object.duration,\n      host: {\n      id: object.host_id,\n      email: object.host_email,\n    },\n    }\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -620,
+        -580
+      ],
+      "id": "a3c44fdf-3f9d-4ecd-85f6-07648d9992ca",
+      "name": "meeting-info"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "participant-joined",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        -180
+      ],
+      "id": "f29afb03-db1f-4301-b5ef-1b18687eb0a3",
+      "name": "participants-joined",
+      "webhookId": "285cc8ab-496b-4780-9f5a-46c9ef5dd1bd"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://known-moth-included.ngrok-free.app/ms/v1/meeting/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"id\": {{ $json.meeting.id }},\n      \"uuid\": \"{{ $json.meeting.uuid }}\",\n      \"topic\": \"{{ $json.meeting.topic }}\",\n      \"start_time\": \"{{ $json.meeting.startTime }}\",\n      \"join_url\": \"{{ $json.meeting.join_url }}\",\n      \"status\": \"pending\",\n      \"duration\": {{ $json.meeting.duration }},\n      \"host_id\": \"{{ $json.meeting.host.id }}\",\n      \"host_email\": \"{{ $json.meeting.host.email }}\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        -800
+      ],
+      "id": "9cce9439-8e84-44e5-8d52-9c896eb59866",
+      "name": "/ms/v1/meeting/save"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const eventObject = $json.body.payload.object;\nconst participant = eventObject.participant;\n\n// Convertir start_time UTC a hora local (Perú)\nconst joinTimeUTC = new Date(participant.join_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst joinTimeLocal = joinTimeUTC.toLocaleString(\"es-PE\", options);\n\nreturn {\n  json: {\n    meeting: {\n      id: eventObject.id,\n      uuid: eventObject.uuid,\n    },\n    participant: {\n      id: participant.id,\n      user_id: participant.user_id,\n      participant_user_id: participant.participant_user_id || null,\n      user_name: participant.user_name,\n      email: participant.email || null,\n      join_time: joinTimeLocal,\n      isHost: participant.participant_user_id === eventObject.host_id,\n    },\n    host_id: eventObject.host_id,\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -780,
+        -180
+      ],
+      "id": "527929ac-6634-431c-a7d4-f09047d19e68",
+      "name": "participant-info"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://known-moth-included.ngrok-free.app/ms/v1/participant/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"payload\": {\n    \"object\": {\n      \"user_id\": \"{{ $json.participant.user_id }}\",\n      \"participant_user_id\": \"{{ $json.participant.participant_user_id }}\",\n      \"user_name\": \"{{ $json.participant.user_name }}\",\n      \"email\": \"{{ $json.participant.email }}\",\n      \"join_time\": \"{{ $json.participant.join_time }}\",\n      \"isHost\": {{ $json.participant.isHost }},\n      \"host_id\": \"{{ $json.host_id }}\",\n      \"meeting_id\": \"{{ $json.meeting.id }}\",\n      \"meeting_uuid\": \"{{ $json.meeting.uuid }}\"\n    }\n  }\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -560,
+        -180
+      ],
+      "id": "a8209758-1070-4f59-b68e-4bf6607efcba",
+      "name": "/ms/v1/participant/save"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.zoom",
+      "typeVersion": 1,
+      "position": [
+        920,
+        980
+      ],
+      "id": "4fce3783-4f7d-48fb-95cc-cd13766dc297",
+      "name": "Get many meetings",
+      "credentials": {
+        "zoomOAuth2Api": {
+          "id": "GvkMMGjMdcsNDBlN",
+          "name": "zoom-bot-UAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const uniqueMeetingsMap = new Map();\n\nitems\n  .sort((a, b) => new Date(b.json.created_at) - new Date(a.json.created_at))\n  .forEach(item => {\n    const now = new Date();\n    const start = new Date(item.json.start_time);\n    const end = new Date(start.getTime() + item.json.duration * 60000);\n\n    let estado = '';\n    if (now < start) {\n      estado = 'pendiente';\n    } else if (now >= start && now <= end) {\n      estado = 'en curso';\n    } else {\n      estado = 'finalizado';\n    }\n\n    // Solo agrega si aún no existe una reunión con este ID\n    if (!uniqueMeetingsMap.has(item.json.id)) {\n      uniqueMeetingsMap.set(item.json.id, {\n        json: {\n          ...item.json,\n          estado,\n        }\n      });\n    }\n  });\n\n// Tomar los primeros 15 elementos únicos\nreturn Array.from(uniqueMeetingsMap.values()).slice(0, 15);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        980
+      ],
+      "id": "6f55cee4-2bdd-4b89-97f2-50726eef417e",
+      "name": "add status field"
+    },
+    {
+      "parameters": {
+        "path": "/api/reuniones/get-all",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        720,
+        980
+      ],
+      "id": "0e658ff2-29a3-4b92-8a75-f9d61b0dc657",
+      "name": "api/reuniones",
+      "webhookId": "ff2fd24c-2119-42f3-bd3e-ec5e3921d1f3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1360,
+        980
+      ],
+      "id": "df02834a-99bc-42b0-b6d7-b561b4d6c34b",
+      "name": "endpoint"
+    },
+    {
+      "parameters": {
+        "jsCode": "const uriBase = \"https://encuesta-e0vth.web.app\"\nconst idMeeting = $input.first().json.meeting.id\nconst idHost = $input.first().json.meeting.host.id\n\nreturn {\n  formLink: `${uriBase}/${idMeeting}/${idHost}`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        -580
+      ],
+      "id": "60cacd45-4125-4116-bd75-0c5c99eaa84e",
+      "name": "encuesta - link"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc51b7e4-d5c2-4cd4-9488-4d181eaaa02e",
+              "name": "subject",
+              "type": "string",
+              "value": "=📢 Resumen de la Clase: \"{{ $('Zoom: Get data by meetingId').item.json.topic }}\" - {{ DateTime.fromISO($('Zoom: Get data by meetingId').item.json.start_time).toFormat('yyyy-MM-dd HH:mm') }}"
+            },
+            {
+              "id": "f3940ea2-9084-4c25-828e-5ddaa428ec83",
+              "name": "=to",
+              "type": "string",
+              "value": "=hola@uai.edu.pe"
+            },
+            {
+              "id": "1211af5b-2240-44ce-9df7-63d93f57806e",
+              "name": "body",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b0965436-1479-45e3-bf40-701d300982bf",
+      "name": "TEST - Sort for mail delivery",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1280,
+        220
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        -800
+      ],
+      "id": "18d78d06-8cc3-45b7-967d-f80b52c7ff8e",
+      "name": "meeting-created",
+      "webhookId": "e16d2b77-53a2-4c2b-a1b0-c184e1118753"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const meeting = $json.body.payload.object;\nconst operatorEmail = $json.body.payload.operator;\n\n// Convertir start_time UTC a hora local (Perú)\nconst startTimeUTC = new Date(meeting.start_time);\n\nconst options = {\n  timeZone: \"America/Lima\",\n  hour12: false,\n  year: \"numeric\",\n  month: \"2-digit\",\n  day: \"2-digit\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n};\n\nconst startTimeLocal = startTimeUTC.toLocaleString(\"es-PE\", options);\n\nreturn {\n  json: {\n    meeting: {\n      id: meeting.id,\n      uuid: meeting.uuid,\n      topic: meeting.topic,\n      startTime: startTimeLocal,\n      join_url: meeting.join_url,\n      status: \"pending\",\n      duration: meeting.duration,\n      host: {\n        id: meeting.host_id,\n        email: operatorEmail || \"\",\n      },\n    },\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        -800
+      ],
+      "id": "1df42446-7f3c-4781-b962-c03fc40077e5",
+      "name": "meeting-info1"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://known-moth-included.ngrok-free.app/ms/v1/meeting/status/{{ $json.meeting.id }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"status\": \"started\"\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -420,
+        -400
+      ],
+      "id": "ecd06f2d-df90-4b59-beb0-ed7e3544c42d",
+      "name": "/ms/v1/meeting/status/:meeting_id"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://known-moth-included.ngrok-free.app/ms/v1/meeting/summary/{{ $('basic-info-depuration-I').item.json.meetingId }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"summary\": {{ $json.summary }}\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        220
+      ],
+      "id": "f80e7608-2b29-498d-b85e-41f2d9cd7006",
+      "name": "/ms/v1/meeting/summary/:meeting_id"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawHtml = $json.html;\nreturn {\n  summary: JSON.stringify(rawHtml) // convierte a string escapado válido\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        220
+      ],
+      "id": "ed481668-4674-4036-9f16-3de69b643efe",
+      "name": "format to firebase"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://known-moth-included.ngrok-free.app/ms/v1/meeting/status/{{ $json.body.payload.object.id }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"status\": \"finished\"\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -780,
+        300
+      ],
+      "id": "0d762604-beb8-4dbe-95e9-7de8f3ff2101",
+      "name": "/ms/v1/meeting/status/:meeting_id - finished"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meeting-end",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        300
+      ],
+      "id": "2d9084d8-dd3c-4e8b-a49b-09c84b8634fa",
+      "name": "meeting-end",
+      "webhookId": "ba9b3d14-789c-4b6e-bcbc-0cccdc7b1b51"
+    },
+    {
+      "parameters": {
+        "content": "## CASI OBSOLETO\n",
+        "height": 260,
+        "width": 920
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        920
+      ],
+      "id": "0d5a8e52-9043-4653-b7a1-930a89c208b8",
+      "name": "Sticky Note"
     }
   ],
   "pinData": {},
@@ -328,22 +763,9 @@
             "node": "Send meeting summary",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Filter: Only 1 item": {
-      "main": [
-        [
+          },
           {
-            "node": "Filter: Only 1 item",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Zoom: Get transcript file",
+            "node": "format to firebase",
             "type": "main",
             "index": 0
           }
@@ -354,7 +776,7 @@
       "main": [
         [
           {
-            "node": "Filter: Only 1 item",
+            "node": "Zoom: Get transcript file",
             "type": "main",
             "index": 0
           }
@@ -365,7 +787,7 @@
       "main": [
         [
           {
-            "node": "Sort for mail delivery",
+            "node": "TEST - Sort for mail delivery",
             "type": "main",
             "index": 0
           }
@@ -377,17 +799,6 @@
         [
           {
             "node": "Zoom: Get participants data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Sort for mail delivery": {
-      "main": [
-        [
-          {
-            "node": "Format to html",
             "type": "main",
             "index": 0
           }
@@ -445,22 +856,11 @@
         ]
       ]
     },
-    "OpenRouter Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Create meeting summary",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Zoom: Get data by meetingId": {
       "main": [
         [
           {
-            "node": "Zoom: Get transcripts data",
+            "node": "basic-info-depuration-II",
             "type": "main",
             "index": 0
           }
@@ -471,18 +871,215 @@
       "main": [
         [
           {
-            "node": "basic-info",
+            "node": "basic-info-depuration-I",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "basic-info": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create meeting summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "basic-info-depuration-I": {
       "main": [
         [
           {
             "node": "Zoom: Get data by meetingId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "basic-info-depuration-II": {
+      "main": [
+        [
+          {
+            "node": "Zoom: Get transcripts data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-started": {
+      "main": [
+        [
+          {
+            "node": "Zoom: Get-data-by-meetingId",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort for mail": {
+      "main": [
+        [
+          {
+            "node": "Send url for students",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoom: Get-data-by-meetingId": {
+      "main": [
+        [
+          {
+            "node": "meeting-info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-info": {
+      "main": [
+        [
+          {
+            "node": "encuesta - link",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "/ms/v1/meeting/status/:meeting_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "participants-joined": {
+      "main": [
+        [
+          {
+            "node": "participant-info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "participant-info": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/participant/save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many meetings": {
+      "main": [
+        [
+          {
+            "node": "add status field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add status field": {
+      "main": [
+        [
+          {
+            "node": "endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "api/reuniones": {
+      "main": [
+        [
+          {
+            "node": "Get many meetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "encuesta - link": {
+      "main": [
+        [
+          {
+            "node": "Sort for mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TEST - Sort for mail delivery": {
+      "main": [
+        [
+          {
+            "node": "Format to html",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-created": {
+      "main": [
+        [
+          {
+            "node": "meeting-info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-info1": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/meeting/save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "/ms/v1/meeting/summary/:meeting_id": {
+      "main": [
+        []
+      ]
+    },
+    "format to firebase": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/meeting/summary/:meeting_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "meeting-end": {
+      "main": [
+        [
+          {
+            "node": "/ms/v1/meeting/status/:meeting_id - finished",
             "type": "main",
             "index": 0
           }
@@ -494,11 +1091,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d3bf9d96-a286-4a2f-824e-05a43c3215c1",
+  "versionId": "3c5f0e01-ee16-4428-8724-a32d80d24d37",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "44e428a6215583099d0174473a6ca8f47ec4ace791e57f79f0b224a51c9b8d2b"
   },
-  "id": "67mwO3ZHVWS2KiSs",
+  "id": "JA4YirAEmOgYdeDJ",
   "tags": []
 }
